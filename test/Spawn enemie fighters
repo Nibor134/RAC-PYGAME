@@ -28,5 +28,9 @@ for i in range(8):
     Enemies = Mob()
     all_sprites.add(Enemies)
     mobs.add(Enemies)    
-  
 
+# Check to see if mob hit a player
+hits = pygame.sprite.spritecollide(player, mobs, False)
+if hits: 
+    running = False
+  
