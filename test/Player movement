@@ -38,17 +38,10 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
         self.speedy = 0
-        # self.lives = 3
-        # self.hidden = False
-        # self.hide_timer = pygame.time.get_ticks()
+        self.lives = 3
 
     # Player movement with keys
     def update(self):
-        # Hide player
-        # if self.hidden and pygame.time.get_ticks - self.hide_timer > 1000:
-        #     self.hidden = False
-        #     self.rect.center = (WIDTH -10 , HEIGHT / 2)
-
         self.speedx = 0
         self.speedy = 0
         keystate = pygame.key.get_pressed()
@@ -72,11 +65,6 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
-    # Lives
-    # def hide(self):
-    #     self.hidden = True
-    #     self.hide_timer = pygame.time.get_ticks()
-    #     self.rect.center = (WIDTH / 2, HEIGHT + 2000)
 
 # Enemie fighters
 class Mob(pygame.sprite.Sprite):
@@ -147,11 +135,13 @@ while running:
     all_sprites.update()
 
     # Check to see if enemie hit the player
-    hits = pygame.sprite.spritecollide(player, mobs, False, pygame.sprite.collide_circle)
+    hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
     if hits:
-    #     player.hide()
-    #     player.lives -= 1
-    # if player.lives == 0:
+        player.rect.centerx = WIDTH / 100
+        player.rect.bottom = HEIGHT / 2
+        player.lives -= 1
+        
+    elif player.lives == 0:
         running = False
         
         
