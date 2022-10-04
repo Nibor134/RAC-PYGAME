@@ -141,8 +141,8 @@ while running:
         player.rect.bottom = HEIGHT / 2
         player.lives -= 1
         
-    if player.lives == 0:
-        running = False
+    elif player.lives == 0:
+         running = False
         
         
         
