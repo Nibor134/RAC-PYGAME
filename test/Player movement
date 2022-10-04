@@ -84,11 +84,11 @@ class Mob(pygame.sprite.Sprite):
     def update(self):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.width > HEIGHT < -10 or self.rect.left < -25 or self.rect.right > WIDTH + 50 or HEIGHT > 500:
-            self.rect.x = random.randrange(960, 1000)
-            self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
-            self.speedy = random.randrange(-3, 3)    
-            self.speedx = random.randrange(-12, -5)
+        if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
+            self.kill()
+            m = Mob()
+            all_sprites.add(m)
+            mobs.add(m)
 
 # Load All game graphics
 #Background
