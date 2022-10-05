@@ -56,7 +56,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
 
-       # Creating Borders 
+       # Creating Borders for the player so it can't go of the screen
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
@@ -81,14 +81,15 @@ class Mob(pygame.sprite.Sprite):
         self.speedy = random.randrange(-3, 3)
         self.speedx = random.randrange(-12, -5)
 
+    # killing and spawning new enemies when they go of the screen
     def update(self):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
             self.kill()
-            m = Mob()
-            all_sprites.add(m)
-            mobs.add(m)
+            new_enemies = Mob()
+            all_sprites.add(new_enemies)
+            mobs.add(new_enemies)
 
 # Load All game graphics
 #Background
