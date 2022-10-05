@@ -2,13 +2,21 @@
 import pygame
 pygame.init()
 
-import test.Display_settings
-import test.Timerfunction 
+import lib.Display_settings
+import lib.Timerfunction
+import lib.Player
+import lib.Enemy 
 
 # Set up the drawing window
-screen = test.Display_settings
+screen = lib.Display_settings
 
 # Set up Main Menu
-Time = test.Timerfunction
+Time = lib.Timerfunction
 
-# Set up Game Mode
+# Set up Player
+Player = lib.Player
+
+# Set up Enemy
+
+Enemy = lib.Enemy
+
