@@ -67,6 +67,12 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
 
+    # Shoot bullets button
+    def shoot(self):
+        bullet = Bullets(self.rect.right, self.rect.centery)
+        all_sprites.add(bullet)
+        bullets.add(bullet)
+
 # Enemie fighters
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
@@ -118,6 +124,24 @@ class Meteors(pygame.sprite.Sprite):
             new_meteors = Meteors()
             all_sprites.add(new_meteors)
             meteor.add(new_meteors)
+            
+# bullets
+class Bullets(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = bullet_img
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.centerx = x
+        self.speedy = 0
+        self.speedx = 10
+
+    def update(self):
+        self.rect.x += self.speedx
+        # Remove the bullet if it is no longer on the screen
+        if self.rect.right > 1000:
+            self.kill()
 
 # Show how many lives the player has left in the top left corner using images
 def draw_lives(surf, x, y, lives, img):
@@ -140,9 +164,11 @@ player_lives_img = pygame.transform.scale(player_img, (40, 29))
 player_lives_img.set_colorkey(BLACK)
 enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()
 meteor_img = pygame.image.load(path.join(img_dir, "meteor.png" )).convert()
+bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
 
 # All sprites 
 all_sprites = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
 mobs = pygame.sprite.Group() 
 for i in range(10):
     Enemies = Mob()
@@ -175,10 +201,22 @@ while running:
         # check for closing window
         if event.type == pygame.QUIT:
             running = False
+        # Press spacebar to shoot
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE:
+                player.shoot()
 
     # update
     all_sprites.update()
-
+    # Check to see if bullet hits an enemie
+    hits_bullet_enemie = pygame.sprite.groupcollide(mobs, bullets, True, True)
+    for hit in hits_bullet_enemie:
+        # Spawn new enemies when killed by bullet
+        m = Mob()
+        all_sprites.add(m)
+        mobs.add(m)
+    # Check to see if bullet hit meteor
+    hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True) 
     # Check to see if enemie hit the player
     hits_player_enemie = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
     if hits_player_enemie:
