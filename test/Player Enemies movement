@@ -163,7 +163,7 @@ player_img = pygame.image.load(path.join(img_dir, "playership.png")).convert()
 player_lives_img = pygame.transform.scale(player_img, (40, 29))
 player_lives_img.set_colorkey(BLACK)
 enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()
-meteor_img = pygame.image.load(path.join(img_dir, "meteor.png" )).convert()
+meteor_img = pygame.image.load(path.join(img_dir, "spacerock.png" )).convert()
 bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
 
 # All sprites 
