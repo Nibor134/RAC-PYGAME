@@ -39,7 +39,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
         self.speedy = 0
-        self.lives = 1000000
+        self.lives = 3
 
     # Player movement with arrow keys
     def update(self):
@@ -118,7 +118,14 @@ class Meteors(pygame.sprite.Sprite):
             new_meteors = Meteors()
             all_sprites.add(new_meteors)
             meteor.add(new_meteors)
-                
+
+# Show how many lives the player has left in the top left corner using images
+def draw_lives(surf, x, y, lives, img):
+    for i in range(lives):
+        img_rect = img.get_rect()
+        img_rect.x = x + 30 * i
+        img_rect.y = y
+        surf.blit(img, img_rect)
 
 # Load All game graphics
 #Background
@@ -129,6 +136,8 @@ scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 1
 # Player and Enemies and meteors
 player_img = pygame.image.load(path.join(img_dir, "playership.png")).convert()
+player_lives_img = pygame.transform.scale(player_img, (40, 29))
+player_lives_img.set_colorkey(BLACK)
 enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()
 meteor_img = pygame.image.load(path.join(img_dir, "meteor.png" )).convert()
 
@@ -146,7 +155,6 @@ for i in range(3):
     meteors = Meteors()
     all_sprites.add(meteors)
     meteor.add(meteors)
-
 
 # Game loop
 running = True
@@ -194,13 +202,11 @@ while running:
         
     elif player.lives == 0:
          running = False
-        
-        
-        
 
-    #draw / render
+    # Draw / render
     all_sprites.draw(screen)
-    # flip the display
+    draw_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
+    # Flip the display
     pygame.display.flip()
 
 pygame.quit()
