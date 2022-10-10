@@ -29,18 +29,19 @@ clock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(player_img, (50,38))
+        self.image = pygame.transform.scale(player_img, (80,60))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
-        self.radius = 20
+        self.radius = 24
+        # Make the hitbox visible ---> 
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.centerx = WIDTH / 100
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
         self.speedy = 0
-        self.lives = 3
+        self.lives = 1000000
 
-    # Player movement with keys
+    # Player movement with arrow keys
     def update(self):
         self.speedx = 0
         self.speedy = 0
@@ -75,6 +76,7 @@ class Mob(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * .85 / 2)
+        # Make the hiutbox visible --->
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.x = random.randrange(990, 1000)
         self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
@@ -91,26 +93,60 @@ class Mob(pygame.sprite.Sprite):
             all_sprites.add(new_enemies)
             mobs.add(new_enemies)
 
+# Creating indestructable meteors that the player has to dodge
+class Meteors(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = meteor_img
+        self.image = pygame.transform.scale(meteor_img, (100,80))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * 0.7 / 2)
+        # Make the hitbox visible --->
+        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
+        self.rect.x = random.randrange(990, 1000)
+        self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
+        self.speedy = random.randrange(0, 1)
+        self.speedx = random.randrange(-12, -5)
+
+    # killing and spawning a new meteor when they go of the screen
+    def update(self):
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top < -50 or self.rect.left < WIDTH - 1100  or self.rect.right > WIDTH + 100 or self.rect.bottom > 530:
+            self.kill()
+            new_meteors = Meteors()
+            all_sprites.add(new_meteors)
+            meteor.add(new_meteors)
+                
+
 # Load All game graphics
 #Background
-background = pygame.image.load(path.join(img_dir, "Galaxyback.png")).convert()
+background = pygame.image.load(path.join(img_dir, "space.png")).convert()
 background_rect = background.get_rect()
 bg_width = background.get_width()
 scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 1
-# Player and Enemies
-player_img = pygame.image.load(path.join(img_dir, "playerShip1_blue.png")).convert()
+# Player and Enemies and meteors
+player_img = pygame.image.load(path.join(img_dir, "playership.png")).convert()
 enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()
+meteor_img = pygame.image.load(path.join(img_dir, "meteor.png" )).convert()
 
 # All sprites 
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group() 
-for i in range(14):
+for i in range(10):
     Enemies = Mob()
     all_sprites.add(Enemies)
     mobs.add(Enemies) 
 player = Player()
 all_sprites.add(player)
+meteor = pygame.sprite.Group()
+for i in range(3):
+    meteors = Meteors()
+    all_sprites.add(meteors)
+    meteor.add(meteors)
+
 
 # Game loop
 running = True
@@ -136,11 +172,25 @@ while running:
     all_sprites.update()
 
     # Check to see if enemie hit the player
-    hits = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
-    if hits:
+    hits_player_enemie = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
+    if hits_player_enemie:
         player.rect.centerx = WIDTH / 100
         player.rect.bottom = HEIGHT / 2
         player.lives -= 1
+        # Respawn an enemie when it hit the player
+        new_enemies = Mob()
+        all_sprites.add(new_enemies)
+        mobs.add(new_enemies)
+    # Check to see if meteor hit the player
+    hits_player_meteors = pygame.sprite.spritecollide(player, meteor, True, pygame.sprite.collide_circle)
+    if hits_player_meteors:
+        player.rect.centerx = WIDTH / 100
+        player.rect.bottom = HEIGHT / 2
+        player.lives -= 1
+        # Respawn a meteor when it hit the player
+        new_meteors = Meteors()
+        all_sprites.add(new_meteors)
+        meteor.add(new_meteors)
         
     elif player.lives == 0:
          running = False
