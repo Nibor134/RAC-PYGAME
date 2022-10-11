@@ -1,5 +1,10 @@
-#Timerfunction  
-screen = pygame.display.set_mode( (800,600) )
+
+import pygame
+pygame.init()
+#import Display_settings
+ 
+#Timerfunction
+screen = pygame.display.set_mode((1000,500))
 font = pygame.font.SysFont(None, 32)
 
 #Clockticks
