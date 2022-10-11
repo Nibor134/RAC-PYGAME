@@ -104,7 +104,7 @@ class Meteors(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = meteor_img
-        self.image = pygame.transform.scale(meteor_img, (80,70))
+        self.image = pygame.transform.scale(meteor_img, (80,71))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * 0.7 / 2)
