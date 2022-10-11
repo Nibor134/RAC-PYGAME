@@ -104,7 +104,7 @@ class Meteors(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = meteor_img
-        self.image = pygame.transform.scale(meteor_img, (100,80))
+        self.image = pygame.transform.scale(meteor_img, (80,70))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * 0.7 / 2)
@@ -112,7 +112,7 @@ class Meteors(pygame.sprite.Sprite):
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.x = random.randrange(990, 1000)
         self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
-        self.speedy = random.randrange(0, 1)
+        self.speedy = random.randrange(-1, 1)
         self.speedx = random.randrange(-12, -5)
 
     # killing and spawning a new meteor when they go of the screen
