@@ -1,20 +1,21 @@
+
 import pygame
-
 pygame.init()
-
-screen = pygame.display.set_mode( (800,600) )
-
+#import Display_settings
+ 
+#Timerfunction
+screen = pygame.display.set_mode((1000,500))
 font = pygame.font.SysFont(None, 32)
 
+#Clockticks
 clock = pygame.time.Clock()
-
-start_time = pygame.time.get_ticks() 
-def stats(score):
-
-    font.render_to(screen, (4, 4), "Score:"+str(score), None, size=64)
+frame_count = 0
+frame_rate = 60
+start_time = 90
 
 paused  = False
 running = True
+
 while running:
 
     for event in pygame.event.get():
@@ -30,20 +31,17 @@ while running:
 
     if not paused:
         counting_time = pygame.time.get_ticks() - start_time
-
         # change milliseconds into minutes, seconds, milliseconds
         counting_minutes = str(counting_time//60000).zfill(2)
         counting_seconds = str( (counting_time%60000)//1000 ).zfill(2)
-        # counting_millisecond = str(counting_time%1000).zfill(3)
 
         counting_string = "%s:%s" % (counting_minutes, counting_seconds)
 
         counting_text = font.render(str(counting_string), 1, (255,255,255))
         counting_rect = counting_text.get_rect(center = screen.get_rect().center)
-
+     
     screen.fill( (0,0,0) )
     screen.blit(counting_text, counting_rect)
 
     pygame.display.update()
-
-    clock.tick(10)
+    clock.tick(frame_rate)
