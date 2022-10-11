@@ -1,0 +1,9 @@
+game_over = True
+running = True
+while running: 
+    if game_over:
+        show_go_screen()
+        game_over = False
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False 

@@ -6,7 +6,7 @@ pygame.init()
 screen = pygame.display.set_mode((1000,600))
 
 #Display van Titel en Icoon van Game 
-pygame.display.set_caption('Test Title Screen')
+pygame.display.set_caption('Space Liberators')
 icon = pygame.image.load('StartScreenIcon.png')
 
 pygame.display.set_icon(icon)
@@ -23,7 +23,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False 
     # Kleur van het start scherm
-    screen.fill((192,192,192)) 
+    screen.fill((192,192,192))
 
     # Positie start knop 
     screen.blit(test_surface,(400,200))
