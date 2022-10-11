@@ -24,6 +24,7 @@ def show_go_screen():
             if event.type == pygame.KEYUP:
                 waiting = False 
 
+# Open game over Screen when game over
 game_over = True
 running = True
 while running: 
