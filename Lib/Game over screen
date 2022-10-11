@@ -1,3 +1,4 @@
+# Display text in game over screen
 font_name = pygame.font.match_font('arial')
 def draw_text(surf, text, size, x, y):
     font = pygame.font.Font(font_name, size)
@@ -5,6 +6,23 @@ def draw_text(surf, text, size, x, y):
     text_rect = text_surface.get_rect()
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
+
+
+# Function to pop up game over screen when player dies 
+def show_go_screen():
+    screen.blit(background, background_rect)
+    draw_text(screen, 'Space Liberators', 64, Width / 2, Height / 4)
+    draw_text(screen, 'Arrow keys to move, Space to Fire', 22, Width /2, Height / 2)
+    draw_text(screen, 'Press key to start', 18, Width / 2, Height * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting: 
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False 
 
 game_over = True
 running = True
