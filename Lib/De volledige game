@@ -76,10 +76,10 @@ class Player(pygame.sprite.Sprite):
     def shoot(self):
         now = pygame.time.get_ticks()
         if now - self.last_bullet > self.bullet_delay:
-                self.last_bullet = now
-                bullet = Bullets(self.rect.right, self.rect.centery)
-                all_sprites.add(bullet)
-                bullets.add(bullet)
+            self.last_bullet = now
+            bullet = Bullets(self.rect.right, self.rect.centery)
+            all_sprites.add(bullet)
+            bullets.add(bullet)
 
 # Enemie fighters
 class Enemies(pygame.sprite.Sprite):
