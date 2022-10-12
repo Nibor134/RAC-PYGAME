@@ -1,4 +1,5 @@
-# Shoot 'em up game
+# Shoot 'em up game 
+from turtle import left
 import pygame
 import random
 from os import path
@@ -22,7 +23,7 @@ BLUE = (0, 0, 255)
 pygame.init()
 pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Shoot 'em up")
+pygame.display.set_caption("Space liberators")
 clock = pygame.time.Clock()
 
 # Create player
@@ -39,10 +40,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT / 2
         self.speedx = 0
         self.speedy = 0
+        self.bullet_delay = 250
+        self.last_bullet = pygame.time.get_ticks()
         self.lives = 3
-
-    # Player movement with arrow keys
+        
     def update(self):
+         # Player movement with arrow keys
         self.speedx = 0
         self.speedy = 0
         keystate = pygame.key.get_pressed()
@@ -56,6 +59,8 @@ class Player(pygame.sprite.Sprite):
             self.speedy = 5
         self.rect.x += self.speedx
         self.rect.y += self.speedy
+        if keystate[pygame.K_SPACE]:
+            self.shoot()
 
        # Creating Borders for the player so it can't go of the screen
         if self.rect.right > WIDTH:
@@ -69,12 +74,15 @@ class Player(pygame.sprite.Sprite):
 
     # Shoot bullets button
     def shoot(self):
-        bullet = Bullets(self.rect.right, self.rect.centery)
-        all_sprites.add(bullet)
-        bullets.add(bullet)
+        now = pygame.time.get_ticks()
+        if now - self.last_bullet > self.bullet_delay:
+                self.last_bullet = now
+                bullet = Bullets(self.rect.right, self.rect.centery)
+                all_sprites.add(bullet)
+                bullets.add(bullet)
 
 # Enemie fighters
-class Mob(pygame.sprite.Sprite):
+class Enemies(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = enemie_img
@@ -82,7 +90,7 @@ class Mob(pygame.sprite.Sprite):
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * .85 / 2)
-        # Make the hiutbox visible --->
+        # Make the hitbox visible --->
         # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
         self.rect.x = random.randrange(990, 1000)
         self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
@@ -95,9 +103,9 @@ class Mob(pygame.sprite.Sprite):
         self.rect.y += self.speedy
         if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
             self.kill()
-            new_enemies = Mob()
+            new_enemies = Enemies()
             all_sprites.add(new_enemies)
-            mobs.add(new_enemies)
+            enemies.add(new_enemies)
 
 # Creating indestructable meteors that the player has to dodge
 class Meteors(pygame.sprite.Sprite):
@@ -142,9 +150,34 @@ class Bullets(pygame.sprite.Sprite):
         # Remove the bullet if it is no longer on the screen
         if self.rect.right > 1000:
             self.kill()
+            
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.size = size
+        self.image = explosion_img[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 80
+
+    def update(self): 
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(explosion_img[self.size]):
+                self.kill()
+            else: 
+                center = self.rect.center
+                self.image = explosion_img[self.size][self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+
 
 # Show how many lives the player has left in the top left corner using images
-def draw_lives(surf, x, y, lives, img):
+def show_lives(surf, x, y, lives, img):
     for i in range(lives):
         img_rect = img.get_rect()
         img_rect.x = x + 30 * i
@@ -165,15 +198,28 @@ player_lives_img.set_colorkey(BLACK)
 enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()
 meteor_img = pygame.image.load(path.join(img_dir, "spacerock.png" )).convert()
 bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
+# Making an image loop so an explosion is visible when something dies
+explosion_img = {}
+explosion_img['big'] = []
+explosion_img['small'] = []
+explosion_img['player'] = []
+for i in range (9):
+    filename = 'explosie{}.png'.format(i)
+    img = pygame.image.load(path.join(img_dir, filename)).convert()
+    img.set_colorkey(BLACK)
+    img_big = pygame.transform.scale(img, (75, 75))
+    explosion_img['big'].append(img_big)
+    img_small = pygame.transform.scale(img, (32, 32))
+    explosion_img['small'].append(img_small)
 
 # All sprites 
 all_sprites = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
-mobs = pygame.sprite.Group() 
-for i in range(10):
-    Enemies = Mob()
-    all_sprites.add(Enemies)
-    mobs.add(Enemies) 
+enemies = pygame.sprite.Group() 
+for i in range(8):
+    enemies_jets = Enemies()
+    all_sprites.add(enemies_jets)
+    enemies.add(enemies_jets) 
 player = Player()
 all_sprites.add(player)
 meteor = pygame.sprite.Group()
@@ -201,32 +247,37 @@ while running:
         # check for closing window
         if event.type == pygame.QUIT:
             running = False
-        # Press spacebar to shoot
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.shoot()
-
+        
     # update
     all_sprites.update()
     # Check to see if bullet hits an enemie
-    hits_bullet_enemie = pygame.sprite.groupcollide(mobs, bullets, True, True)
+    hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
     for hit in hits_bullet_enemie:
         # Spawn new enemies when killed by bullet
-        m = Mob()
-        all_sprites.add(m)
-        mobs.add(m)
+        new_enemies = Enemies()
+        all_sprites.add(new_enemies)
+        enemies.add(new_enemies)
+        # Explosion
+        explosion = Explosion(hit.rect.center, 'big')
+        all_sprites.add(explosion)
+
     # Check to see if bullet hit meteor
-    hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True) 
+    hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
+    for hit in hits_bullet_meteor:
+        explosion = Explosion(hit.rect.center, 'small')
+        all_sprites.add(explosion)
+
     # Check to see if enemie hit the player
-    hits_player_enemie = pygame.sprite.spritecollide(player, mobs, True, pygame.sprite.collide_circle)
-    if hits_player_enemie:
+    hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
+    for hit in hits_player_enemie:
+        player.lives -=1
         player.rect.centerx = WIDTH / 100
         player.rect.bottom = HEIGHT / 2
-        player.lives -= 1
         # Respawn an enemie when it hit the player
-        new_enemies = Mob()
+        new_enemies = Enemies()
         all_sprites.add(new_enemies)
-        mobs.add(new_enemies)
+        enemies.add(new_enemies)
+
     # Check to see if meteor hit the player
     hits_player_meteors = pygame.sprite.spritecollide(player, meteor, True, pygame.sprite.collide_circle)
     if hits_player_meteors:
@@ -243,7 +294,7 @@ while running:
 
     # Draw / render
     all_sprites.draw(screen)
-    draw_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
+    show_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
     # Flip the display
     pygame.display.flip()
 
