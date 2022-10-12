@@ -111,9 +111,10 @@ class Enemies(pygame.sprite.Sprite):
 class Meteors(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = meteor_img
-        self.image = pygame.transform.scale(meteor_img, (80,71))
-        self.image.set_colorkey(BLACK)
+        self.image_original = random.choice(meteor_images)
+        self.image_original = pygame.transform.scale(self.image_original, (80,71))
+        self.image_original.set_colorkey(BLACK)
+        self.image = self.image_original.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width * 0.7 / 2)
         # Make the hitbox visible --->
@@ -122,9 +123,25 @@ class Meteors(pygame.sprite.Sprite):
         self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
         self.speedy = random.randrange(-1, 1)
         self.speedx = random.randrange(-12, -5)
+        self.rotation = 0
+        self.rotation_speed = random.randrange(-8, 8)
+        self.last_update = pygame.time.get_ticks()
 
+    # Rotate the meteors for better looks
+    def rotate(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > 50:
+            self.last_update = now
+            self.rotation = (self.rotation + self.rotation_speed) % 360
+            new_image = pygame.transform.rotate(self.image_original, self.rotation)
+            old_center = self.rect.center
+            self.image = new_image
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
+        
     # killing and spawning a new meteor when they go of the screen
     def update(self):
+        self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top < -50 or self.rect.left < WIDTH - 1100  or self.rect.right > WIDTH + 100 or self.rect.bottom > 530:
@@ -196,8 +213,12 @@ player_img = pygame.image.load(path.join(img_dir, "playership.png")).convert()
 player_lives_img = pygame.transform.scale(player_img, (40, 29))
 player_lives_img.set_colorkey(BLACK)
 enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()
-meteor_img = pygame.image.load(path.join(img_dir, "spacerock.png" )).convert()
 bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
+# Random meteor image
+meteor_images = []
+meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png']
+for img in meteor_list:
+    meteor_images.append(pygame.image.load(path.join(img_dir, img)).convert())
 # Making an image loop so an explosion is visible when something dies
 explosion_img = {}
 explosion_img['big'] = []
