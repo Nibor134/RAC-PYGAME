@@ -1,3 +1,6 @@
+score = 0
+
+
 def updateFile():
     f = open('scores.txt','r') # opens the file in read mode
     file = f.readlines() # reads all the lines in as a list
