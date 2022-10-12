@@ -1,5 +1,4 @@
 # Shoot 'em up game 
-from turtle import left
 import pygame
 import random
 from os import path
@@ -249,6 +248,9 @@ for i in range(3):
     all_sprites.add(meteors)
     meteor.add(meteors)
 
+# initialize score
+score = 0
+
 # Game loop
 running = True
 while running:
@@ -274,6 +276,8 @@ while running:
     # Check to see if bullet hits an enemie
     hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
     for hit in hits_bullet_enemie:
+        # Add score
+        score += 1 
         # Spawn new enemies when killed by bullet
         new_enemies = Enemies()
         all_sprites.add(new_enemies)
