@@ -10,6 +10,7 @@ img_dir = path.join(path.dirname(__file__), "img")
 WIDTH = 1000
 HEIGHT = 500
 FPS = 60
+POWERUP_TIME = 5000
 
 # Colors
 WHITE = (255, 255, 255)
@@ -42,8 +43,15 @@ class Player(pygame.sprite.Sprite):
         self.bullet_delay = 250
         self.last_bullet = pygame.time.get_ticks()
         self.lives = 3
-        
+        self.power = 1
+        self.power_time = pygame.time.get_ticks()
+        self.powbullet_delay = 0
+
     def update(self):
+        # Check if powerup is active
+        if self.power >= 2 and pygame.time.get_ticks() - self.power_time > POWERUP_TIME:
+            self.power -= 1
+            self.power_time = pygame.time.get_ticks()
          # Player movement with arrow keys
         self.speedx = 0
         self.speedy = 0
@@ -59,7 +67,7 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if keystate[pygame.K_SPACE]:
-            self.shoot()
+            self.shoot() or self.powshoot()
 
        # Creating Borders for the player so it can't go of the screen
         if self.rect.right > WIDTH:
@@ -71,14 +79,28 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
 
+    def gunpow(self):
+        self.power += 1
+        self.power_time = pygame.time.get_ticks()
+
     # Shoot bullets button
     def shoot(self):
         now = pygame.time.get_ticks()
-        if now - self.last_bullet > self.bullet_delay:
-            self.last_bullet = now
-            bullet = Bullets(self.rect.right, self.rect.centery)
-            all_sprites.add(bullet)
-            bullets.add(bullet)
+        if self.power == 1:
+            if now - self.last_bullet > self.bullet_delay:
+                self.last_bullet = now
+                bullet = Bullets(self.rect.right, self.rect.centery)
+                all_sprites.add(bullet)
+                bullets.add(bullet)
+    
+    def powshoot(self):
+        now = pygame.time.get_ticks()
+        if self.power >= 2:
+            if now - self.last_bullet > self.powbullet_delay:
+                self.last_bullet = now
+                bullet2 = Bullets(self.rect.right, self.rect.centery)
+                all_sprites.add(bullet2)
+                bullets.add(bullet2)
 
 # Enemie fighters
 class Enemies(pygame.sprite.Sprite):
@@ -191,6 +213,22 @@ class Explosion(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
+class Powerups(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.type = random.choice(['better_gun', 'extra_life'])
+        self.image = powerup_images[self.type]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.speedx = -2
+
+    def update(self):
+        self.rect.x += self.speedx
+        # Remove the powerup if it is no longer on the screen
+        if self.rect.left < -10:
+            self.kill()
+
 
 # Show how many lives the player has left in the top left corner using images
 def show_lives(surf, x, y, lives, img):
@@ -231,9 +269,14 @@ for i in range (9):
     explosion_img['big'].append(img_big)
     img_small = pygame.transform.scale(img, (32, 32))
     explosion_img['small'].append(img_small)
+# Powerup images
+powerup_images = {}
+powerup_images['better_gun'] = pygame.image.load(path.join(img_dir , 'bettergun.png')).convert()
+powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'extralife.png')).convert()
 
 # All sprites 
 all_sprites = pygame.sprite.Group()
+powerups = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group() 
 for i in range(8):
@@ -250,6 +293,7 @@ for i in range(3):
 
 # initialize score
 score = 0
+old_score = score
 
 # Game loop
 running = True
@@ -285,6 +329,19 @@ while running:
         # Explosion
         explosion = Explosion(hit.rect.center, 'big')
         all_sprites.add(explosion)
+        # spawn a powerup
+        if random.random() > 0.9:
+            power_ups = Powerups(hit.rect.center)
+            all_sprites.add(power_ups)
+            powerups.add(power_ups)
+
+    # Check to see if player picked up powerup
+    hits_player_powerup = pygame.sprite.spritecollide(player, powerups, True)
+    for hit in hits_player_powerup:
+        if hit.type == 'extra_life':
+            player.lives += 1
+        if hit.type == 'better_gun':
+            player.gunpow()
 
     # Check to see if bullet hit meteor
     hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
