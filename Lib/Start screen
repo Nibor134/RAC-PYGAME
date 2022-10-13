@@ -1,32 +1,110 @@
 import pygame
-
+from os import path
 pygame.init()
 
-# Afmetingen van het scherm
-screen = pygame.display.set_mode((1000,600))
+img_dir = path.join(path.dirname(__file__), "img")
 
-#Display van Titel en Icoon van Game 
+# Size Window
+WIDTH = 1000
+HEIGHT = 500
+
+screen = pygame.display.set_mode((WIDTH,HEIGHT))
+
+#Display Title, Icon Game, Buttons
 pygame.display.set_caption('Space Liberators')
-icon = pygame.image.load('StartScreenIcon.png')
+icon = pygame.image.load(path.join(img_dir, "playership.png"))
 
+play_button_image = pygame.image.load(path.join(img_dir, "play_button.png")).convert_alpha()
+highscore_button_image = pygame.image.load(path.join(img_dir, "highscore_button.png")).convert_alpha()
+exit_button_image = pygame.image.load(path.join(img_dir, "exit_button.png")).convert_alpha()
+
+#play_button_image = pygame.image.load(path.join(img_dir, "play_button.png"))
+#highscore_button_image = pygame.image.load(path.join(img_dir, "highscore_button.png"))
+#exit_button_image = pygame.image.load(path.join(img_dir, "exit_button.png"))
+
+#Background Image, Scale Size
+background = pygame.image.load(path.join(img_dir, "Startmenu.jpg")).convert()
+background = pygame.transform.scale(background,(WIDTH,HEIGHT))
+background_rect = background.get_rect()
+
+#play_button = pygame.transform.scale(play_button,(100,100))
+#highscore_button = pygame.transform.scale(highscore_button,(100,100))
+#exit_button = pygame.transform.scale(exit_button,(100,100))
+
+# Display Title Icon
 pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
 
-# Start knop op titel scherm 
-test_surface = pygame.Surface((200,200))
-test_surface.fill('Red')
+# Colors 
+GREY  = (192, 192, 192)
+RED = (255, 0, 0)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+WHITE = (255, 255, 255)
 
-# Game Window Loop 
+# Define fonts, size, text
+#font = pygame.font.match_font('arial', 50)
+font = pygame.font.SysFont('impact',50)
+
+def draw_text(text,font, WHITE, x,y): 
+    title = font.render(text, True, WHITE)
+    screen.blit(title,(x,y))
+    
+
+# Button image scaling, button position, button mouse functionality 
+class Button():
+    def __init__(self,x,y,image,scale): 
+        width = image.get_width()
+        height = image.get_height()
+        self.image = pygame.transform.scale(image,(int(width * scale), int(height * scale)))
+        self.rect = self.image.get_rect()
+        self.rect.topleft = (x,y)
+        self.clicked = False
+
+    def draw(self,surface):
+        action = False
+        pos = pygame.mouse.get_pos()
+
+        # Click condition
+        if self.rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
+                action = True
+        if pygame.mouse.get_pressed()[0] == 0: 
+            self.clicked = False
+        surface.blit(self.image, (self.rect.x, self.rect.y))
+
+        return action 
+
+# Test shape on screen
+#test_surface = pygame.Surface((200,200))
+#test_surface.fill('Red')
+
+play_button = Button((WIDTH / 4), 250, play_button_image, 0.4)
+highscore_button = Button((WIDTH / 2.15), 250, highscore_button_image, 0.4)
+exit_button = Button((WIDTH / 1.5), 250, exit_button_image, 0.4)
+
+# Game Window Loop, # Show background, Buttons
 running = True
 while running: 
-    for event in pygame.event.get():
+    screen.blit(background, background_rect)
+    draw_text('Space Liberators',font, WHITE, 340 ,125)
+    if play_button.draw(screen):
+        print('Play')
+    if highscore_button.draw(screen):
+        print('Highscore')
+    if exit_button.draw(screen): 
+        running = False
+        
+    for event in pygame.event.get():    
         if event.type == pygame.QUIT:
             running = False 
-    # Kleur van het start scherm
-    screen.fill((192,192,192))
-
-    # Positie start knop 
-    screen.blit(test_surface,(400,200))
+    pygame.display.update
+    # Manual position buttons on screen 
+    #screen.blit(play_button,((WIDTH / 4),250)) 
+    #screen.blit(highscore_button,((WIDTH / 2.15),250))
+    #screen.blit(exit_button,((WIDTH / 1.5),250)) 
 
     pygame.display.update()       
     clock.tick(60)
