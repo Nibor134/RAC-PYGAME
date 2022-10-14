@@ -1,11 +1,17 @@
 # Shoot 'em up game 
+from ast import Pass
 from turtle import left
 import pygame
 import random
 from os import path
 import math
+import Startscreen
 
-
+if Startscreen.full_game_state == 3: 
+   exit()
+#if Startscreen.full_game_state == 2:
+    # Highscore screen
+    
 # Screen and graphics
 img_dir = path.join(path.dirname(__file__), "img")
 
