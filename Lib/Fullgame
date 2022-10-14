@@ -26,6 +26,14 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space liberators")
 clock = pygame.time.Clock()
 
+# Def to display the score on the screen
+def draw_text(surf, text, x, y):
+    font = pygame.font.Font("Lib/img/font.ttf", 20)
+    text_surface = font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
+
 # Create player
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -79,6 +87,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
 
+    # gun powerup
     def gunpow(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
@@ -93,6 +102,7 @@ class Player(pygame.sprite.Sprite):
                 all_sprites.add(bullet)
                 bullets.add(bullet)
     
+    # Shoot bullets button if powerup is active
     def powshoot(self):
         now = pygame.time.get_ticks()
         if self.power >= 2:
@@ -118,15 +128,15 @@ class Enemies(pygame.sprite.Sprite):
         self.speedy = random.randrange(-3, 3)
         self.speedx = random.randrange(-12, -5)
 
-    # killing and spawning new enemies when they go of the screen
     def update(self):
+        # killing and spawning new enemies when they go of the screen
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
             self.kill()
-            new_enemies = Enemies()
-            all_sprites.add(new_enemies)
-            enemies.add(new_enemies)
+            enemies_jets = Enemies()
+            all_sprites.add(enemies_jets)
+            enemies.add(enemies_jets )
 
 # Creating indestructable meteors that the player has to dodge
 class Meteors(pygame.sprite.Sprite):
@@ -165,7 +175,7 @@ class Meteors(pygame.sprite.Sprite):
         self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top < -50 or self.rect.left < WIDTH - 1100  or self.rect.right > WIDTH + 100 or self.rect.bottom > 530:
+        if self.rect.top < -60 or self.rect.left < WIDTH - 1150  or self.rect.right > WIDTH + 100 or self.rect.bottom > 560:
             self.kill()
             new_meteors = Meteors()
             all_sprites.add(new_meteors)
@@ -229,7 +239,6 @@ class Powerups(pygame.sprite.Sprite):
         if self.rect.left < -10:
             self.kill()
 
-
 # Show how many lives the player has left in the top left corner using images
 def show_lives(surf, x, y, lives, img):
     for i in range(lives):
@@ -245,7 +254,7 @@ background_rect = background.get_rect()
 bg_width = background.get_width()
 scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 1
-# Player and Enemies and meteors
+# Player and Enemies and bullets
 player_img = pygame.image.load(path.join(img_dir, "playership.png")).convert()
 player_lives_img = pygame.transform.scale(player_img, (40, 29))
 player_lives_img.set_colorkey(BLACK)
@@ -278,7 +287,7 @@ powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'extralife.
 all_sprites = pygame.sprite.Group()
 powerups = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
-enemies = pygame.sprite.Group() 
+enemies = pygame.sprite.Group()
 for i in range(8):
     enemies_jets = Enemies()
     all_sprites.add(enemies_jets)
@@ -293,7 +302,6 @@ for i in range(3):
 
 # initialize score
 score = 0
-old_score = score
 
 # Game loop
 running = True
@@ -317,11 +325,12 @@ while running:
         
     # update
     all_sprites.update()
+
     # Check to see if bullet hits an enemie
     hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
     for hit in hits_bullet_enemie:
         # Add score
-        score += 1 
+        score += 1
         # Spawn new enemies when killed by bullet
         new_enemies = Enemies()
         all_sprites.add(new_enemies)
@@ -374,9 +383,10 @@ while running:
     elif player.lives == 0:
          running = False
 
-    # Draw / render
+    # Draw on screen
     all_sprites.draw(screen)
     show_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
+    draw_text(screen, str(score), WIDTH / 2, 10)
     # Flip the display
     pygame.display.flip()
 
