@@ -288,7 +288,7 @@ all_sprites = pygame.sprite.Group()
 powerups = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
-for i in range(8):
+for i in range(6):
     enemies_jets = Enemies()
     all_sprites.add(enemies_jets)
     enemies.add(enemies_jets) 
@@ -328,11 +328,18 @@ while running:
     # update
     all_sprites.update()
 
+    previous_score = score
+
     # Check to see if bullet hits an enemie
     hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
     for hit in hits_bullet_enemie:
         # Add score
         score += 1
+        if (previous_score//50) < (score//50):
+            print('add more', previous_score//50, score//50)
+            more_enemies = Enemies()
+            enemies.add(more_enemies)
+            all_sprites.add(more_enemies)
         # Spawn new enemies when killed by bullet
         new_enemies = Enemies()
         all_sprites.add(new_enemies)
