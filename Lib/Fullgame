@@ -230,7 +230,9 @@ for i in range(3):
 
 # Game loop
 running = True
+game_over = True
 while running:
+    
     # keep loop running at the right speed
     clock.tick(FPS)
 

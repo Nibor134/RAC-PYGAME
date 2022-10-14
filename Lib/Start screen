@@ -13,7 +13,6 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 #Display Title, Icon Game, Buttons
 pygame.display.set_caption('Space Liberators')
 icon = pygame.image.load(path.join(img_dir, "playership.png"))
-
 play_button_image = pygame.image.load(path.join(img_dir, "play_button.png")).convert_alpha()
 highscore_button_image = pygame.image.load(path.join(img_dir, "highscore_button.png")).convert_alpha()
 exit_button_image = pygame.image.load(path.join(img_dir, "exit_button.png")).convert_alpha()
@@ -27,6 +26,7 @@ background = pygame.image.load(path.join(img_dir, "Startmenu.jpg")).convert()
 background = pygame.transform.scale(background,(WIDTH,HEIGHT))
 background_rect = background.get_rect()
 
+#Manual scale
 #play_button = pygame.transform.scale(play_button,(100,100))
 #highscore_button = pygame.transform.scale(highscore_button,(100,100))
 #exit_button = pygame.transform.scale(exit_button,(100,100))
@@ -85,7 +85,7 @@ play_button = Button((WIDTH / 4), 250, play_button_image, 0.4)
 highscore_button = Button((WIDTH / 2.15), 250, highscore_button_image, 0.4)
 exit_button = Button((WIDTH / 1.5), 250, exit_button_image, 0.4)
 
-# Game Window Loop, # Show background, Buttons
+# Game Window Loop, # Show background, Buttons, Title
 running = True
 while running: 
     screen.blit(background, background_rect)
@@ -101,6 +101,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False 
     pygame.display.update
+    
     # Manual position buttons on screen 
     #screen.blit(play_button,((WIDTH / 4),250)) 
     #screen.blit(highscore_button,((WIDTH / 2.15),250))
