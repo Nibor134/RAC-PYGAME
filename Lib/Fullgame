@@ -26,6 +26,7 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space liberators")
 clock = pygame.time.Clock()
 
+<<<<<<< HEAD
 # Def to display the score on the screen
 def draw_text(surf, text, x, y):
     font = pygame.font.Font("Lib/img/font.ttf", 20)
@@ -34,6 +35,17 @@ def draw_text(surf, text, x, y):
     text_rect.midtop = (x, y)
     surf.blit(text_surface, text_rect)
 
+=======
+# Display text in game over screen, Font use in game, location
+font_name = pygame.font.match_font('impact')
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, BLACK)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
+    
+>>>>>>> 0d61ff8e6b28b3b9fdd6442ab13ea442d797daa2
 # Create player
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -247,6 +259,21 @@ def show_lives(surf, x, y, lives, img):
         img_rect.y = y
         surf.blit(img, img_rect)
 
+# Function to pop up game over screen when player dies, Controls 
+def show_go_screen():
+    draw_text(screen, 'Space Liberators', 64, Width / 2, Height / 4)
+    draw_text(screen, 'Arrow keys to move, Space to Fire', 22, Width /2, Height / 2)
+    draw_text(screen, 'Press key to start', 18, Width / 2, Height * 3 / 4)
+    pygame.display.flip()
+    waiting = True
+    while waiting: 
+        clock.tick(FPS)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.KEYUP:
+                waiting = False 
+
 # Load All game graphics
 #Background
 background = pygame.image.load(path.join(img_dir, "space.png")).convert()
@@ -307,7 +334,23 @@ score = 0
 running = True
 game_over = True
 while running:
-    
+    if game_over:
+       def show_go_screen():
+            game_over = False 
+            all_sprites = pygame.sprite.Group()
+            bullets = pygame.sprite.Group()
+            enemies = pygame.sprite.Group() 
+            for i in range(8):
+                enemies_jets = Enemies()
+                all_sprites.add(enemies_jets)
+                enemies.add(enemies_jets) 
+            player = Player()
+            all_sprites.add(player)
+            meteor = pygame.sprite.Group()
+            for i in range(3):
+                meteors = Meteors()
+                all_sprites.add(meteors)
+                meteor.add(meteors)    
     # keep loop running at the right speed
     clock.tick(FPS)
 
@@ -390,7 +433,8 @@ while running:
         meteor.add(new_meteors)
         
     elif player.lives == 0:
-         running = False
+        game_over = False
+        #running = False
 
     # Draw on screen
     all_sprites.draw(screen)
@@ -399,4 +443,4 @@ while running:
     # Flip the display
     pygame.display.flip()
 
-pygame.quit()
+#pygame.quit()
