@@ -90,6 +90,7 @@ running = True
 while running: 
     screen.blit(background, background_rect)
     draw_text('Space Liberators',font, WHITE, 340 ,125)
+    draw_text('Arrow keys to move, Space to Fire',font, WHITE, 190, 405)
     if play_button.draw(screen):
         print('Play')
     if highscore_button.draw(screen):
