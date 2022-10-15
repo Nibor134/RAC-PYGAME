@@ -1,3 +1,4 @@
+from turtle import Screen
 import pygame, sys
 from os import path
 from button import Button
@@ -14,7 +15,7 @@ pygame.mixer.init()
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("Lib/img/Cyberpunk.ttf", size)
 
-screen = pygame.display.set_mode((1000, 500))
+SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space liberators")
 clock = pygame.time.Clock()
 img_dir = path.join(path.dirname(__file__), "img")
@@ -39,7 +40,19 @@ font_name = pygame.font.match_font('impact')
 
 def highscores():
     while True:
-        screen.blit(HS, (0, 0))
+        SCREEN.blit(HS, (0, 0))
+        HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
+
+        HIGHSCORE_TEXT = get_font(25).render("This is the Highscore screen.", True, "White")
+        HIGHSCORE_RECT = HIGHSCORE_TEXT.get_rect(center=(500, 130))
+        SCREEN.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
+
+        HIGHSCORE_BACK = Button(image=None, pos=(500, 150), 
+            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
+
+        HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
+        HIGHSCORE_BACK.update(SCREEN)
+
         def draw_text(surf, text, size, x, y):
             font = pygame.font.Font(font_name, size)
             text_surface = font.render(text, True, WHITE)
@@ -51,16 +64,13 @@ def highscores():
         for line in file:
             if 'highscore: ' in line:
                 highscore = str(line.replace('highscore: ', '')) 
-                draw_text(screen, 'Your highscore   =', 20, 490 , 5)
-                draw_text(screen, str(highscore), 20, 590, 5)
+                draw_text(SCREEN, 'Your highscore   =', 20, 490 , 5)
+                draw_text(SCREEN, str(highscore), 20, 590, 5)
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if HIGHSCORE_BACK.checkForInput(HIGHSCORE_MOUSE_POS):
-                    main_menu() 
+        #for event in pygame.event.get():
+            #if event.type == pygame.QUIT:
+                #pygame.quit()
+                #sys.exit()
 
         pygame.display.update()
 
