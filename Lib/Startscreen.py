@@ -1,6 +1,7 @@
 import pygame
 from os import path
 pygame.init()
+import Menubutton
 
 img_dir = path.join(path.dirname(__file__), "img")
 
@@ -12,7 +13,7 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
 #Display Title, Icon Game, Buttons
 pygame.display.set_caption('Space Liberators')
-icon = pygame.image.load(path.join(img_dir, "playership.png"))
+icon = pygame.image.load(path.join(img_dir, "player 1.png"))
 play_button_image = pygame.image.load(path.join(img_dir, "play_button.png")).convert_alpha()
 highscore_button_image = pygame.image.load(path.join(img_dir, "highscore_button.png")).convert_alpha()
 exit_button_image = pygame.image.load(path.join(img_dir, "exit_button.png")).convert_alpha()
@@ -49,58 +50,39 @@ font = pygame.font.SysFont('impact',50)
 
 def draw_text(text,font, WHITE, x,y): 
     title = font.render(text, True, WHITE)
-    screen.blit(title,(x,y))
-    
-
-# Button image scaling, button position, button mouse functionality 
-class Button():
-    def __init__(self,x,y,image,scale): 
-        width = image.get_width()
-        height = image.get_height()
-        self.image = pygame.transform.scale(image,(int(width * scale), int(height * scale)))
-        self.rect = self.image.get_rect()
-        self.rect.topleft = (x,y)
-        self.clicked = False
-
-    def draw(self,surface):
-        action = False
-        pos = pygame.mouse.get_pos()
-
-        # Click condition
-        if self.rect.collidepoint(pos):
-            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
-                self.clicked = True
-                action = True
-        if pygame.mouse.get_pressed()[0] == 0: 
-            self.clicked = False
-        surface.blit(self.image, (self.rect.x, self.rect.y))
-
-        return action 
+    screen.blit(title,(x,y))    
 
 # Test shape on screen
 #test_surface = pygame.Surface((200,200))
 #test_surface.fill('Red')
 
-play_button = Button((WIDTH / 4), 250, play_button_image, 0.4)
-highscore_button = Button((WIDTH / 2.15), 250, highscore_button_image, 0.4)
-exit_button = Button((WIDTH / 1.5), 250, exit_button_image, 0.4)
+play_button = Menubutton.Button((WIDTH / 4), 250, play_button_image, 0.4)
+highscore_button = Menubutton.Button((WIDTH / 2.15), 250, highscore_button_image, 0.4)
+exit_button = Menubutton.Button((WIDTH / 1.5), 250, exit_button_image, 0.4)
 
 # Game Window Loop, # Show background, Buttons, Title
 running = True
+full_game_state = 0
+
 while running: 
     screen.blit(background, background_rect)
     draw_text('Space Liberators',font, WHITE, 340 ,125)
     draw_text('Arrow keys to move, Space to Fire',font, WHITE, 190, 405)
     if play_button.draw(screen):
+        full_game_state = 1
+        running = False
         print('Play')
     if highscore_button.draw(screen):
+        full_game_state = 2
+        running = False
         print('Highscore')
     if exit_button.draw(screen): 
+        full_game_state = 3
         running = False
         
     for event in pygame.event.get():    
         if event.type == pygame.QUIT:
-            running = False 
+            full_game_state = 3
     pygame.display.update
     
     # Manual position buttons on screen 
