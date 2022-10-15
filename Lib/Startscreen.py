@@ -13,7 +13,7 @@ screen = pygame.display.set_mode((WIDTH,HEIGHT))
 
 #Display Title, Icon Game, Buttons
 pygame.display.set_caption('Space Liberators')
-icon = pygame.image.load(path.join(img_dir, "playership.png"))
+icon = pygame.image.load(path.join(img_dir, "player 1.png"))
 play_button_image = pygame.image.load(path.join(img_dir, "play_button.png")).convert_alpha()
 highscore_button_image = pygame.image.load(path.join(img_dir, "highscore_button.png")).convert_alpha()
 exit_button_image = pygame.image.load(path.join(img_dir, "exit_button.png")).convert_alpha()

@@ -1,6 +1,10 @@
 import pygame, sys
+from fullgame import game
+#from fullgame import show_go_screen
+from Score import highscores
 from button import Button
 
+  
 pygame.init()
 
 SCREEN = pygame.display.set_mode((1000, 500))
@@ -14,19 +18,13 @@ def get_font(size): # Returns Press-Start-2P in the desired size
 
 def play():
     while True:
+        game()
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
-
-        SCREEN.fill("black")
-
-        PLAY_TEXT = get_font(25).render("This is the PLAY screen.", True, "White")
-        PLAY_RECT = PLAY_TEXT.get_rect(center=(500, 130))
-        SCREEN.blit(PLAY_TEXT, PLAY_RECT)
-
-        PLAY_BACK = Button(image=None, pos=(500, 160), 
-                            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
-
         PLAY_BACK.changeColor(PLAY_MOUSE_POS)
-        PLAY_BACK.update(SCREEN)
+        PLAY_BACK.update(screen)
+        
+        PLAY_BACK = Button(image=None, pos=(500, 160), 
+                text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -37,22 +35,14 @@ def play():
                     main_menu()
 
         pygame.display.update()
-    
+
 def highscore():
     while True:
         SCREEN.blit(HS, (0, 0))
         HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
-
-        HIGHSCORE_TEXT = get_font(25).render("This is the Highscore screen.", True, "White")
-        HIGHSCORE_RECT = HIGHSCORE_TEXT.get_rect(center=(500, 130))
-        SCREEN.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
-
-        HIGHSCORE_BACK = Button(image=None, pos=(500, 150), 
-                            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
-
-        HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
-        HIGHSCORE_BACK.update(SCREEN)
-
+        highscores()       
+        
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -62,6 +52,7 @@ def highscore():
                     main_menu()
 
         pygame.display.update()
+
 
 def main_menu():
     while True:
