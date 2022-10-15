@@ -4,7 +4,7 @@ import random
 from os import path
 import math
 #import Startscreen
-from MainMenu import main_menu
+#from MainMenu import main_menu
 
 #if Startscreen.full_game_state == 3: 
    #exit()
@@ -412,4 +412,4 @@ def game():
         # Flip the display
         pygame.display.flip()
 
-#pygame.quit()
+    pygame.quit()
