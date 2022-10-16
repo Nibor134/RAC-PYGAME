@@ -6,9 +6,13 @@ from fullgame import game
 from button import Button
 
 pygame.init()
+pygame.mixer.init
+pygame.mixer.music.load('SpaceMenu.mp3')
+pygame.mixer.music.set_volume(0.5)
+pygame.mixer.music.play()
 
 SCREEN = pygame.display.set_mode((1000, 500))
-pygame.display.set_caption("Menu")
+pygame.display.set_caption("Space Invaders")
 BLACK = (0, 0, 0)
 BG = pygame.image.load("Lib/img/space.png")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
@@ -27,6 +31,9 @@ def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("Lib/img/NeoTechItalic-WyKZY.ttf", size)
 
 def play():
+    pygame.mixer.music.load('SpaceGame.mp3')
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play()
     while True:
         game()
         PLAY_MOUSE_POS = pygame.mouse.get_pos()
@@ -40,10 +47,10 @@ def play():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.K_ESCAPE:
                 if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                     main_menu()
-
+        
         pygame.display.update()
 
 def highscores():
@@ -145,7 +152,6 @@ def main_menu():
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-
         pygame.display.update()
 main_menu()
 
