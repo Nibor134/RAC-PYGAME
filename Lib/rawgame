@@ -64,7 +64,7 @@ class Player(pygame.sprite.Sprite):
             self.power -= 1
             self.power_time = pygame.time.get_ticks()
 
-         # Player movement with arrow keys
+        # Player movement with arrow keys
         self.speedx = 0
         self.speedy = 0
         keystate = pygame.key.get_pressed()
@@ -81,7 +81,7 @@ class Player(pygame.sprite.Sprite):
         if keystate[pygame.K_SPACE]:
             self.shoot() or self.powshoot()
 
-       # Creating Borders for the player so it can't go of the screen
+    # Creating Borders for the player so it can't go of the screen
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
@@ -139,6 +139,35 @@ class Enemies(pygame.sprite.Sprite):
         if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
             self.kill()
             newenemie()
+
+# Enemie sharks
+class Sharks(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = shark_img
+        self.image = pygame.transform.scale(shark_img, (80,60))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * .85 / 2)
+        # Make the hitbox visible --->
+        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
+        self.rect.x = 900
+        self.rect.y = 500
+        self.speedy = (-3)
+        self.speedx = (-5)
+
+    def update(self):
+        if self.rect.x == 500:
+            self.speedy = 2
+            self.rect.y -= self.speedy
+        self.rect.y += self.speedy
+        self.rect.x += self.speedx
+        # killing and spawning new enemies when they go of the screen
+        if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 150 or self.rect.bottom > 700:
+            self.kill()
+            new_sharks = Sharks()
+            all_sprites.add(new_sharks)
+            sharks.add(new_sharks)
 
 # Creating indestructable meteors that the player has to dodge
 class Meteors(pygame.sprite.Sprite):
@@ -262,7 +291,8 @@ background_rect = background.get_rect()
 bg_width = background.get_width()
 scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 1
-# Player and Enemies and bullets
+# Player and Enemies and bullets and sharks
+shark_img = pygame.image.load(path.join(img_dir, "sharkie2.png")).convert()
 player_img = pygame.image.load(path.join(img_dir, "playership1_blue.png")).convert()
 player_lives_img = pygame.transform.scale(player_img, (40, 29))
 player_lives_img.set_colorkey(BLACK)
@@ -293,6 +323,11 @@ powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'extralife.
 
 # All sprites 
 all_sprites = pygame.sprite.Group()
+sharks = pygame.sprite.Group()
+for i in range(1):
+    sharkies = Sharks()
+    all_sprites.add(sharkies)
+    sharks.add(sharkies)
 powerups = pygame.sprite.Group()
 bullets = pygame.sprite.Group()
 enemies = pygame.sprite.Group()
@@ -351,6 +386,7 @@ while running:
             more_enemies = Enemies()
             enemies.add(more_enemies)
             all_sprites.add(more_enemies)
+
         # Spawn new enemies when killed by bullet
         newenemie()
         # Explosion

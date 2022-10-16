@@ -1,13 +1,11 @@
 from turtle import Screen
 import pygame, sys
-from fullgame import game
+from Fullgame import game
 #from fullgame import show_go_screen
-from Score import highscores
 from button import Button
-
   
 pygame.init()
-
+BLACK = (0, 0, 0)
 screen = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Menu")
 
@@ -39,18 +37,40 @@ def play():
 
 def highscore():
     while True:
-        #screen.blit(HS, (0, 0))
-        #HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
-        highscores()       
-pygame.display.update()   
+        screen.blit(HS, (0, 0))
+        HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
+
+        HIGHSCORE_TEXT = get_font(25).render("This is the Highscore screen.", True, "White")
+        HIGHSCORE_RECT = HIGHSCORE_TEXT.get_rect(center=(500, 130))
+        screen.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
+
+        HIGHSCORE_BACK = Button(image=None, pos=(500, 150), 
+            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
+
+        HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
+        HIGHSCORE_BACK.update(screen)
+
+        def draw_text(surf, text, size, x, y):
+            font = pygame.font.Font(get_font, size)
+            text_surface = font.render(text, True, BLACK)
+            text_rect = text_surface.get_rect()
+            text_rect.midtop = (x, y)
+            surf.blit(text_surface, text_rect)
+
+        file = open('Highscores.txt', 'r')
+        for line in file:
+            if 'highscore: ' in line:
+                highscore = str(line.replace('highscore: ', '')) 
+                draw_text(screen, 'Your highscore   =', 20, 490 , 5)
+                draw_text(screen, str(highscore), 20, 590, 5)
         
-        #for event in pygame.event.get():
-            #if event.type == pygame.quit():
-                #pygame.quit()
-                #sys.exit()
-            #if event.type == pygame.MOUSEBUTTONDOWN:
-                #if HIGHSCORE_BACK.checkForInput(HIGHSCORE_MOUSE_POS):
-                    #main_menu()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+        pygame.display.update()
+
 
         
 
@@ -85,7 +105,7 @@ def main_menu():
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play()
                 if HIGHSCORE_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    highscores()
+                    highscore()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()

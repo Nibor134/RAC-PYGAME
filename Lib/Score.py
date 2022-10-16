@@ -15,7 +15,7 @@ pygame.mixer.init()
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("Lib/img/Cyberpunk.ttf", size)
 
-SCREEN = pygame.display.set_mode((1000, 500))
+screen = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space liberators")
 clock = pygame.time.Clock()
 img_dir = path.join(path.dirname(__file__), "img")
@@ -40,18 +40,18 @@ font_name = pygame.font.match_font('impact')
 
 def highscores():
     while True:
-        SCREEN.blit(HS, (0, 0))
+        screen.blit(HS, (0, 0))
         HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
 
         HIGHSCORE_TEXT = get_font(25).render("This is the Highscore screen.", True, "White")
         HIGHSCORE_RECT = HIGHSCORE_TEXT.get_rect(center=(500, 130))
-        SCREEN.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
+        screen.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
 
         HIGHSCORE_BACK = Button(image=None, pos=(500, 150), 
             text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
 
         HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
-        HIGHSCORE_BACK.update(SCREEN)
+        HIGHSCORE_BACK.update(screen)
 
         def draw_text(surf, text, size, x, y):
             font = pygame.font.Font(font_name, size)
@@ -64,8 +64,8 @@ def highscores():
         for line in file:
             if 'highscore: ' in line:
                 highscore = str(line.replace('highscore: ', '')) 
-                draw_text(SCREEN, 'Your highscore   =', 20, 490 , 5)
-                draw_text(SCREEN, str(highscore), 20, 590, 5)
+                draw_text(screen, 'Your highscore   =', 20, 490 , 5)
+                draw_text(screen, str(highscore), 20, 590, 5)
         
         #for event in pygame.event.get():
             #if event.type == pygame.QUIT:
