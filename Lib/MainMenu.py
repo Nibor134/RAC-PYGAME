@@ -18,6 +18,7 @@ pygame.display.set_caption("Space Invaders")
 BLACK = (0, 0, 0)
 BG = pygame.image.load("Lib/img/space.png")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
+BG = pygame.transform.scale(BG, (1500, 1000))
 HS = pygame.transform.scale(HS, (1000, 500))
 rect = HS.get_rect()
 rect = rect.move((0, 0))
@@ -118,6 +119,8 @@ def play_game():
             # Shoot bullets button
             def shoot(self):
                 now = pygame.time.get_ticks()
+                pygame.mixer.music.set_volume(1)
+                pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
                 if now - self.last_bullet > self.bullet_delay:
                     self.last_bullet = now
                     bullet = Bullets(self.rect.right, self.rect.centery)
@@ -374,7 +377,7 @@ def play_game():
             hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
             for hit in hits_bullet_meteor:
                 pygame.mixer.music.set_volume(1)
-                pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('hit.mp3'))
                 explosion = Explosion(hit.rect.center, 'small')
                 all_sprites.add(explosion)
 
@@ -404,6 +407,7 @@ def play_game():
                 meteor.add(new_meteors)
             
             elif player.lives == 0:
+                pygame.mixer.Channel(8).play(pygame.mixer.Sound('death.mp3'))
                 game_over = True
                 previous_score = score
                 if score > highscore:
@@ -484,15 +488,15 @@ def show_go_screen():
         GO_SCREEN_MOUSE_POS = pygame.mouse.get_pos()
         left, middle, right = pygame.mouse.get_pressed()    
         SCREEN.blit(HS, (0, 0))
-        GAMEOVER_TEXT = get_font(40).render("GAME OVER ", True, "White")
+        GAMEOVER_TEXT = get_font(80).render("GAME OVER ", True, "#ff0000")
         MANUAL_TEXT = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         HS_TEXT = get_font(40).render("Press SPACE to continue ", True, "White")
         #HS2_TEXT = get_font(40).render("Your highscore   = ", True, "White")
         #SCORE_TEXT = get_font(40).render(str(highscore), True, "White")
 
-        GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 100))
-        MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 150))
-        HS_RECT = HS_TEXT.get_rect(center=(500, 200))
+        GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 150))
+        MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 300))
+        HS_RECT = HS_TEXT.get_rect(center=(500, 400))
         #HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
         #SCORE_RECT = SCORE_TEXT.get_rect(center=(500, 130))
 
@@ -504,7 +508,7 @@ def show_go_screen():
 
         
 
-        GO_SCREEN_BACK = Button(image=None, pos=(500, 400), 
+        GO_SCREEN_BACK = Button(image=None, pos=(500, 450), 
         text_input="BACK TO MAIN MENU", font=get_font(25), base_color="White", hovering_color="Green")
         
         GO_SCREEN_BACK.changeColor(GO_SCREEN_MOUSE_POS)
