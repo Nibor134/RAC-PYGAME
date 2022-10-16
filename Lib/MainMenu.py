@@ -355,8 +355,8 @@ def play_game():
             # Check to see if bullet hits an enemie
             hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
             for hit in hits_bullet_enemie:
-                #pygame.mixer.music.set_volume(1)
-                #pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
+                pygame.mixer.music.set_volume(1)
+                pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
                 score +=1
                 if (previous_score//50) < (score//50):
                     print('add more', previous_score//50, score//50)
@@ -374,16 +374,16 @@ def play_game():
             # Check to see if bullet hit meteor
             hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
             for hit in hits_bullet_meteor:
-                #pygame.mixer.music.set_volume(1)
-                #pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
+                pygame.mixer.music.set_volume(1)
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
                 explosion = Explosion(hit.rect.center, 'small')
                 all_sprites.add(explosion)
 
             # Check to see if enemie hit the player
             hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
             for hit in hits_player_enemie:
-                #pygame.mixer.music.set_volume(1)
-                #pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
+                pygame.mixer.music.set_volume(1)
+                pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
                 player.lives -=1
                 player.rect.centerx = WIDTH / 100
                 player.rect.bottom = HEIGHT / 2
