@@ -12,8 +12,7 @@ pygame.init()
 pygame.mixer.init
 pygame.mixer.music.load('SpaceMenu.mp3')
 pygame.mixer.music.set_volume(0.5)
-pygame.mixer.Channel(1).play(pygame.mixer.Sound('SpaceMenu.mp3'))
-
+pygame.mixer.music.play()
 
 SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space Invaders")
@@ -34,12 +33,10 @@ def draw_text(surf, text, size, x, y):
 def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("Lib/img/NeoTechItalic-WyKZY.ttf", size)
 
-def play():
+def play_game():
     pygame.mixer.music.load('SpaceGame.mp3')
-    pygame.mixer.Channel(2).set_volume(0.2)
-    pygame.mixer.Channel(1).stop
-    pygame.mixer.Channel(2).play(pygame.mixer.Sound('SpaceGame.mp3'))
-
+    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.play()
     while True:
         img_dir = path.join(path.dirname(__file__), "img")
 
@@ -59,8 +56,8 @@ def play():
         pygame.mixer.init()
         pygame.mixer.set_num_channels(10)
         screen = pygame.display.set_mode((WIDTH, HEIGHT))
-        pygame.mixer.music.load('hit.mp3')
-        pygame.mixer.music.load('loselife.mp3')
+        #pygame.mixer.music.load('hit.mp3')
+        #pygame.mixer.music.load('loselife.mp3')
         pygame.display.set_caption("Space liberators")
         clock = pygame.time.Clock()
 
@@ -358,8 +355,8 @@ def play():
             # Check to see if bullet hits an enemie
             hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
             for hit in hits_bullet_enemie:
-                pygame.mixer.music.set_volume(1)
-                pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
+                #pygame.mixer.music.set_volume(1)
+                #pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
                 score +=1
                 if (previous_score//50) < (score//50):
                     print('add more', previous_score//50, score//50)
@@ -377,16 +374,16 @@ def play():
             # Check to see if bullet hit meteor
             hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
             for hit in hits_bullet_meteor:
-                pygame.mixer.music.set_volume(1)
-                pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
+                #pygame.mixer.music.set_volume(1)
+                #pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
                 explosion = Explosion(hit.rect.center, 'small')
                 all_sprites.add(explosion)
 
             # Check to see if enemie hit the player
             hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
             for hit in hits_player_enemie:
-                pygame.mixer.music.set_volume(1)
-                pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
+                #pygame.mixer.music.set_volume(1)
+                #pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
                 player.lives -=1
                 player.rect.centerx = WIDTH / 100
                 player.rect.bottom = HEIGHT / 2
@@ -438,7 +435,7 @@ def play():
         pygame.quit()
         pygame.display.update() 
 
-def highscores():
+def highscores():  
     while True:
         SCREEN.blit(HS, (0, 0))
         HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
@@ -478,16 +475,16 @@ def show_go_screen():
         #file = open('Highscores.txt', 'r')
         #for line in file:
             #if 'highscore: ' in line:
-                    #saved_highscore = str(line.replace('highscore: ', '')) 
-            #str(saved_highscore)
+                    #highscore = str(line.replace('highscore: ', '')) 
+            #str(highscore)
         GO_SCREEN_MOUSE_POS = pygame.mouse.get_pos()
 
         SCREEN.blit(HS, (0, 0))
         GAMEOVER_TEXT = get_font(40).render("GAME OVER ", True, "White")
         MANUAL_TEXT = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
-        HS_TEXT = get_font(40).render("Press key to continue ", True, "White")
+        HS_TEXT = get_font(40).render("Press SPACE to continue ", True, "White")
         #HS2_TEXT = get_font(40).render("Your highscore   = ", True, "White")
-        #SCORE_TEXT = get_font(40).render(str(saved_highscore), True, "White")
+        #SCORE_TEXT = get_font(40).render(str(highscore), True, "White")
 
         GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 100))
         MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 150))
@@ -513,8 +510,9 @@ def show_go_screen():
             if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-            if event.type == pygame.KEYUP:
-               waiting = False         
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    waiting = False         
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if GO_SCREEN_BACK.checkForInput(GO_SCREEN_MOUSE_POS):
                     main_menu()
@@ -565,6 +563,7 @@ def options_menu():
 
 def main_menu():
     while True:
+
         SCREEN.blit(BG, (0, 0))
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
@@ -593,7 +592,7 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play()
+                    play_game()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                     options_menu()
                 if HIGHSCORE_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -601,6 +600,5 @@ def main_menu():
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-        pygame.display.update()
+        pygame.display.update()   
 main_menu()
-
