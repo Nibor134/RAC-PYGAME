@@ -23,7 +23,10 @@ def game():
     # intialize game and create window
     pygame.init()
     pygame.mixer.init()
+    pygame.mixer.set_num_channels(10)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    #pygame.mixer.music.load('hit.mp3')
+    #pygame.mixer.music.load('loselife.mp3')
     pygame.display.set_caption("Space liberators")
     clock = pygame.time.Clock()
 
@@ -250,11 +253,47 @@ def game():
             img_rect.y = y
             surf.blit(img, img_rect)
 
+<<<<<<< HEAD
     # Quick and easy way to spawn a new enemie
     def newenemie():
         new_enemies = Enemies()
         all_sprites.add(new_enemies)
         enemies.add(new_enemies)
+=======
+    # Function to pop up game over screen when player dies, Controls
+    #def show_score_screen():
+        #Startscreen.full_game_state == 0
+
+    def show_go_screen():
+        screen.blit(background, background_rect)
+        draw_text(screen, 'GAME OVER!', 64, WIDTH / 2, HEIGHT / 4)
+        draw_text(screen, 'Arrow keys to move, Space to Fire', 22, WIDTH /2, HEIGHT / 2)
+        draw_text(screen, 'Press key to continue', 18, WIDTH / 2, HEIGHT * 3 / 4)
+        draw_text(screen, 'Your highscore   =', 20, 490 , 5)
+        draw_text(screen, str(saved_highscore), 20, 590, 5)
+        
+        pygame.display.flip()
+        waiting = True
+        while waiting: 
+            clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                if event.type == pygame.KEYUP:
+                    waiting = False 
+                    return             
+
+    # initialize score
+    score = 0
+    previous_score = 0
+    highscore = 0
+    saved_highscore = 0
+    file = open('Highscores.txt', 'r')
+    for line in file:
+        if 'highscore: ' in line:
+            highscore = int(line.replace('highscore: ', ''))
+            saved_highscore = 0
+>>>>>>> c488ab5d89ec35fa50c3ecfef4e9610e3d9aec43
 
     # Load All game graphics
     #Background
@@ -345,8 +384,14 @@ def game():
         # Check to see if bullet hits an enemie
         hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
         for hit in hits_bullet_enemie:
+<<<<<<< HEAD
             # Add score and make the game more difficult
             score += 1
+=======
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
+            score +=1
+>>>>>>> c488ab5d89ec35fa50c3ecfef4e9610e3d9aec43
             if (previous_score//50) < (score//50):
                 print('add more', previous_score//50, score//50)
                 more_enemies = Enemies()
@@ -374,12 +419,15 @@ def game():
         # Check to see if bullet hit meteor
         hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
         for hit in hits_bullet_meteor:
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
             explosion = Explosion(hit.rect.center, 'small')
             all_sprites.add(explosion)
 
         # Check to see if enemie hit the player
         hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
         for hit in hits_player_enemie:
+<<<<<<< HEAD
             newenemie()
         if player.collision_imune == False:
             if hits_player_enemie:
@@ -411,6 +459,43 @@ def game():
             
         if player.lives == 0:
             running = False
+=======
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
+            player.lives -=1
+            player.rect.centerx = WIDTH / 100
+            player.rect.bottom = HEIGHT / 2
+            # Respawn an enemie when it hit the player
+            new_enemies = Enemies()
+            all_sprites.add(new_enemies)
+            enemies.add(new_enemies)
+
+        # Check to see if meteor hit the player
+        hits_player_meteors = pygame.sprite.spritecollide(player, meteor, True, pygame.sprite.collide_circle)
+        if hits_player_meteors:
+
+            player.rect.centerx = WIDTH / 100
+            player.rect.bottom = HEIGHT / 2
+            player.lives -= 1
+            # Respawn a meteor when it hit the player
+            new_meteors = Meteors()
+            all_sprites.add(new_meteors)
+            meteor.add(new_meteors)
+        
+        elif player.lives == 0:
+            game_over = True
+            previous_score = score
+            if score > highscore:
+                highscore = score
+            if highscore > saved_highscore:
+                file = open('Highscores.txt','w')
+                file.write('highscore: ' + str(highscore))
+                file.close
+                saved_highscore = highscore
+            score = 0
+            
+                
+>>>>>>> c488ab5d89ec35fa50c3ecfef4e9610e3d9aec43
 
         # Draw on screen
         all_sprites.draw(screen)

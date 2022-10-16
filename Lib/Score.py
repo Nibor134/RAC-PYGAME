@@ -26,7 +26,6 @@ HS = pygame.transform.scale(HS, (1000, 500))
 rect = HS.get_rect()
 rect = rect.move((0, 0))
 
-pygame.display.flip()
 
 # Colors
 WHITE = (255, 255, 255)
@@ -51,8 +50,13 @@ def highscores():
             text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
 
         HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
+<<<<<<< HEAD
         HIGHSCORE_BACK.update(screen)
 
+=======
+        HIGHSCORE_BACK.update(SCREEN)
+        #pygame.display.update()
+>>>>>>> c488ab5d89ec35fa50c3ecfef4e9610e3d9aec43
         def draw_text(surf, text, size, x, y):
             font = pygame.font.Font(font_name, size)
             text_surface = font.render(text, True, WHITE)
