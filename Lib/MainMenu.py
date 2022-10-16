@@ -1,6 +1,5 @@
 
 import pygame, sys
-<<<<<<< HEAD
 #from fullgame import show_go_screen
 from button import Button
   
@@ -9,20 +8,16 @@ BLACK = (0, 0, 0)
 screen = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Menu")
 
-=======
->>>>>>> 37099451ebea9d13b3e4723ec2d602a63d224fe6
 from button import Button
 import random
 import math
 from os import path
-
 
 pygame.init()
 pygame.mixer.init
 pygame.mixer.music.load('SpaceMenu.mp3')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play()
-
 
 SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space Invaders")
@@ -426,9 +421,7 @@ def play_game():
                     saved_highscore = highscore
                 score = 0
                 show_go_screen()
-            
-                    
-
+    
             # Draw / render
             all_sprites.draw(screen)
             show_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
@@ -512,8 +505,6 @@ def show_go_screen():
         SCREEN.blit(HS_TEXT, HS_RECT)
         #SCREEN.blit(HS2_TEXT, HS2_RECT)
         #SCREEN.blit(SCORE_TEXT, SCORE_RECT)
-
-        
 
         GO_SCREEN_BACK = Button(image=None, pos=(500, 400), 
         text_input="BACK TO MAIN MENU", font=get_font(25), base_color="White", hovering_color="Green")
@@ -648,7 +639,7 @@ def main_menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-<<<<<<< HEAD
+
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play_game()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -658,7 +649,7 @@ def main_menu():
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-=======
+
                 mouse_presses = pygame.mouse.get_pressed()
                 if mouse_presses[0]:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -676,6 +667,6 @@ def main_menu():
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         pygame.quit()
                         sys.exit()
->>>>>>> 37099451ebea9d13b3e4723ec2d602a63d224fe6
+
         pygame.display.update()   
 main_menu()
