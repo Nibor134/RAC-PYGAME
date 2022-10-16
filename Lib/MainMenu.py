@@ -1,17 +1,9 @@
-
 import pygame, sys
-#from fullgame import show_go_screen
-from button import Button
-  
-pygame.init()
-BLACK = (0, 0, 0)
-screen = pygame.display.set_mode((1000, 500))
-pygame.display.set_caption("Menu")
-
 from button import Button
 import random
 import math
 from os import path
+
 
 pygame.init()
 pygame.mixer.init
@@ -19,11 +11,13 @@ pygame.mixer.music.load('SpaceMenu.mp3')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play()
 
+
 SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space Invaders")
 BLACK = (0, 0, 0)
 BG = pygame.image.load("Lib/img/space.png")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
+BG = pygame.transform.scale(BG, (1500, 1000))
 HS = pygame.transform.scale(HS, (1000, 500))
 rect = HS.get_rect()
 rect = rect.move((0, 0))
@@ -124,6 +118,8 @@ def play_game():
             # Shoot bullets button
             def shoot(self):
                 now = pygame.time.get_ticks()
+                pygame.mixer.music.set_volume(1)
+                pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
                 if now - self.last_bullet > self.bullet_delay:
                     self.last_bullet = now
                     bullet = Bullets(self.rect.right, self.rect.centery)
@@ -380,7 +376,7 @@ def play_game():
             hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
             for hit in hits_bullet_meteor:
                 pygame.mixer.music.set_volume(1)
-                pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
+                pygame.mixer.Channel(4).play(pygame.mixer.Sound('hit.mp3'))
                 explosion = Explosion(hit.rect.center, 'small')
                 all_sprites.add(explosion)
 
@@ -410,6 +406,7 @@ def play_game():
                 meteor.add(new_meteors)
             
             elif player.lives == 0:
+                pygame.mixer.Channel(8).play(pygame.mixer.Sound('death.mp3'))
                 game_over = True
                 previous_score = score
                 if score > highscore:
@@ -421,7 +418,9 @@ def play_game():
                     saved_highscore = highscore
                 score = 0
                 show_go_screen()
-    
+            
+                    
+
             # Draw / render
             all_sprites.draw(screen)
             show_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
@@ -488,15 +487,15 @@ def show_go_screen():
         GO_SCREEN_MOUSE_POS = pygame.mouse.get_pos()
         left, middle, right = pygame.mouse.get_pressed()    
         SCREEN.blit(HS, (0, 0))
-        GAMEOVER_TEXT = get_font(40).render("GAME OVER ", True, "White")
+        GAMEOVER_TEXT = get_font(80).render("GAME OVER ", True, "#ff0000")
         MANUAL_TEXT = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         HS_TEXT = get_font(40).render("Press SPACE to continue ", True, "White")
         #HS2_TEXT = get_font(40).render("Your highscore   = ", True, "White")
         #SCORE_TEXT = get_font(40).render(str(highscore), True, "White")
 
-        GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 100))
-        MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 150))
-        HS_RECT = HS_TEXT.get_rect(center=(500, 200))
+        GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 150))
+        MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 300))
+        HS_RECT = HS_TEXT.get_rect(center=(500, 400))
         #HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
         #SCORE_RECT = SCORE_TEXT.get_rect(center=(500, 130))
 
@@ -506,7 +505,9 @@ def show_go_screen():
         #SCREEN.blit(HS2_TEXT, HS2_RECT)
         #SCREEN.blit(SCORE_TEXT, SCORE_RECT)
 
-        GO_SCREEN_BACK = Button(image=None, pos=(500, 400), 
+        
+
+        GO_SCREEN_BACK = Button(image=None, pos=(500, 450), 
         text_input="BACK TO MAIN MENU", font=get_font(25), base_color="White", hovering_color="Green")
         
         GO_SCREEN_BACK.changeColor(GO_SCREEN_MOUSE_POS)
@@ -529,42 +530,6 @@ def show_go_screen():
    
 def options_menu():
     while True:
-
-        screen.blit(HS, (0, 0))
-        HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
-
-        HIGHSCORE_TEXT = get_font(25).render("This is the Highscore screen.", True, "White")
-        HIGHSCORE_RECT = HIGHSCORE_TEXT.get_rect(center=(500, 130))
-        screen.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
-
-        HIGHSCORE_BACK = Button(image=None, pos=(500, 150), 
-            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
-
-        HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
-        HIGHSCORE_BACK.update(screen)
-
-        def draw_text(surf, text, size, x, y):
-            font = pygame.font.Font(get_font, size)
-            text_surface = font.render(text, True, BLACK)
-            text_rect = text_surface.get_rect()
-            text_rect.midtop = (x, y)
-            surf.blit(text_surface, text_rect)
-
-        file = open('Highscores.txt', 'r')
-        for line in file:
-            if 'highscore: ' in line:
-                highscore = str(line.replace('highscore: ', '')) 
-                draw_text(screen, 'Your highscore   =', 20, 490 , 5)
-                draw_text(screen, str(highscore), 20, 590, 5)
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-
-        pygame.display.update()
-
-
         SCREEN.blit(HS, (0, 0))
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
         left, middle, right = pygame.mouse.get_pressed()
@@ -572,7 +537,6 @@ def options_menu():
         OPTIONS_TEXT2 = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
         #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
-
 
         OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(500, 130))
         OPTIONS_RECT2 = OPTIONS_TEXT2.get_rect(center=(500, 200))
@@ -639,17 +603,6 @@ def main_menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-
-                if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    play_game()
-                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    options_menu()
-                if HIGHSCORE_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    highscore()
-                if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    pygame.quit()
-                    sys.exit()
-
                 mouse_presses = pygame.mouse.get_pressed()
                 if mouse_presses[0]:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -667,6 +620,5 @@ def main_menu():
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         pygame.quit()
                         sys.exit()
-
         pygame.display.update()   
 main_menu()
