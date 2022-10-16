@@ -1,7 +1,5 @@
 
 import pygame, sys
-<<<<<<< HEAD
-from Fullgame import game
 #from fullgame import show_go_screen
 from button import Button
   
@@ -10,8 +8,6 @@ BLACK = (0, 0, 0)
 screen = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Menu")
 
-=======
-from fullgame import game
 from button import Button
 from pygame import KEYDOWN
 import random
@@ -28,7 +24,6 @@ pygame.mixer.music.play()
 SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space Invaders")
 BLACK = (0, 0, 0)
->>>>>>> c488ab5d89ec35fa50c3ecfef4e9610e3d9aec43
 BG = pygame.image.load("Lib/img/space.png")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
 HS = pygame.transform.scale(HS, (1000, 500))
@@ -533,7 +528,7 @@ def show_go_screen():
    
 def options_menu():
     while True:
-<<<<<<< HEAD
+
         screen.blit(HS, (0, 0))
         HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
 
@@ -568,14 +563,14 @@ def options_menu():
 
         pygame.display.update()
 
-=======
+
         SCREEN.blit(HS, (0, 0))
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
         OPTIONS_TEXT = get_font(40).render("options ", True, "White")
         OPTIONS_TEXT2 = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
         #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
->>>>>>> c488ab5d89ec35fa50c3ecfef4e9610e3d9aec43
+
 
         OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(500, 130))
         OPTIONS_RECT2 = OPTIONS_TEXT2.get_rect(center=(500, 200))
