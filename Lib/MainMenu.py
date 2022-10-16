@@ -1,4 +1,4 @@
-from turtle import Screen
+#from turtle import Screen
 import pygame, sys
 from fullgame import game
 #from fullgame import show_go_screen
@@ -24,7 +24,7 @@ def draw_text(surf, text, size, x, y):
             surf.blit(text_surface, text_rect)
 
 def get_font(size): # Returns Press-Start-2P in the desired size
-    return pygame.font.Font("Lib/img/font.ttf", size)
+    return pygame.font.Font("Lib/img/NeoTechItalic-WyKZY.ttf", size)
 
 def play():
     while True:
@@ -80,6 +80,32 @@ def highscores():
                     main_menu()
         pygame.display.update()
 
+def options_menu():
+    while True:
+        SCREEN.blit(HS, (0, 0))
+        OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+        OPTIONS_TEXT = get_font(40).render("options ", True, "White")
+        OPTIONS_TEXT2 = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
+        #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
+        #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
+
+        OPTIONS_RECT = OPTIONS_TEXT.get_rect(center=(500, 130))
+        OPTIONS_RECT2 = OPTIONS_TEXT2.get_rect(center=(500, 200))
+        SCREEN.blit(OPTIONS_TEXT, OPTIONS_RECT)
+        SCREEN.blit(OPTIONS_TEXT2, OPTIONS_RECT2)
+
+        OPTIONS_BACK = Button(image=None, pos=(500, 250), 
+            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
+        OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+        OPTIONS_BACK.update(SCREEN)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                        main_menu()
+        pygame.display.update()
 
 def main_menu():
     while True:
@@ -90,16 +116,18 @@ def main_menu():
         MENU_TEXT = get_font(75).render("MAIN MENU", True, "#940076")
         MENU_RECT = MENU_TEXT.get_rect(center=(500, 100))
 
-        PLAY_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(500, 200), 
+        PLAY_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(200, 200), 
                             text_input="PLAY", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
-        HIGHSCORE_BUTTON = Button(image=pygame.image.load("Lib/img/highscore Rect.png"), pos=(500, 300), 
+        HIGHSCORE_BUTTON = Button(image=pygame.image.load("Lib/img/highscore Rect.png"), pos=(700, 200), 
                             text_input="HIGHSCORE", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
-        QUIT_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(500, 400), 
+        QUIT_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(700, 400), 
                             text_input="QUIT", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
+        OPTIONS_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(200, 400), 
+                            text_input="OPTIONS", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
 
         SCREEN.blit(MENU_TEXT, MENU_RECT)
 
-        for button in [PLAY_BUTTON, HIGHSCORE_BUTTON, QUIT_BUTTON]:
+        for button in [PLAY_BUTTON, HIGHSCORE_BUTTON, QUIT_BUTTON, OPTIONS_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(SCREEN)
         
@@ -110,6 +138,8 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play()
+                if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    options_menu()
                 if HIGHSCORE_BUTTON.checkForInput(MENU_MOUSE_POS):
                     highscores()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
