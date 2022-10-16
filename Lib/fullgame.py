@@ -250,9 +250,6 @@ def game():
         if 'highscore: ' in line:
             highscore = int(line.replace('highscore: ', ''))
             saved_highscore = 0
-
-
-
     # Load All game graphics
     #Background
     background = pygame.image.load(path.join(img_dir, "space.png")).convert()
