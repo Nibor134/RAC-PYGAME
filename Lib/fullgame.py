@@ -29,7 +29,10 @@ def game():
     # intialize game and create window
     pygame.init()
     pygame.mixer.init()
+    pygame.mixer.set_num_channels(10)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    #pygame.mixer.music.load('hit.mp3')
+    #pygame.mixer.music.load('loselife.mp3')
     pygame.display.set_caption("Space liberators")
     clock = pygame.time.Clock()
 
@@ -250,6 +253,7 @@ def game():
         if 'highscore: ' in line:
             highscore = int(line.replace('highscore: ', ''))
             saved_highscore = 0
+
     # Load All game graphics
     #Background
     background = pygame.image.load(path.join(img_dir, "space.png")).convert()
@@ -346,6 +350,8 @@ def game():
         # Check to see if bullet hits an enemie
         hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
         for hit in hits_bullet_enemie:
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
             score +=1
             if (previous_score//50) < (score//50):
                 print('add more', previous_score//50, score//50)
@@ -363,12 +369,16 @@ def game():
         # Check to see if bullet hit meteor
         hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
         for hit in hits_bullet_meteor:
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.Channel(4).play(pygame.mixer.Sound('loselife.mp3'))
             explosion = Explosion(hit.rect.center, 'small')
             all_sprites.add(explosion)
 
         # Check to see if enemie hit the player
         hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
         for hit in hits_player_enemie:
+            pygame.mixer.music.set_volume(0.2)
+            pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
             player.lives -=1
             player.rect.centerx = WIDTH / 100
             player.rect.bottom = HEIGHT / 2
@@ -380,6 +390,7 @@ def game():
         # Check to see if meteor hit the player
         hits_player_meteors = pygame.sprite.spritecollide(player, meteor, True, pygame.sprite.collide_circle)
         if hits_player_meteors:
+
             player.rect.centerx = WIDTH / 100
             player.rect.bottom = HEIGHT / 2
             player.lives -= 1
@@ -399,6 +410,7 @@ def game():
                 file.close
                 saved_highscore = highscore
             score = 0
+            
                 
 
         # Draw / render
