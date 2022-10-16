@@ -1,5 +1,6 @@
 
 import pygame, sys
+<<<<<<< HEAD
 #from fullgame import show_go_screen
 from button import Button
   
@@ -8,8 +9,9 @@ BLACK = (0, 0, 0)
 screen = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Menu")
 
+=======
+>>>>>>> 37099451ebea9d13b3e4723ec2d602a63d224fe6
 from button import Button
-from pygame import KEYDOWN
 import random
 import math
 from os import path
@@ -20,6 +22,7 @@ pygame.mixer.init
 pygame.mixer.music.load('SpaceMenu.mp3')
 pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play()
+
 
 SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space Invaders")
@@ -446,7 +449,7 @@ def highscores():
     while True:
         SCREEN.blit(HS, (0, 0))
         HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
-        
+        left, middle, right = pygame.mouse.get_pressed()
         file = open('Highscores.txt', 'r')
         for line in file:
             if 'highscore: ' in line:
@@ -471,12 +474,17 @@ def highscores():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()     
-            if event.type == pygame.MOUSEBUTTONDOWN:  
-                if HIGHSCORE_BACK.checkForInput(HIGHSCORE_MOUSE_POS):
-                    main_menu()
+            if event.type == pygame.MOUSEBUTTONDOWN:                    
+                mouse_presses = pygame.mouse.get_pressed()
+                if mouse_presses[0]:  
+                    if HIGHSCORE_BACK.checkForInput(HIGHSCORE_MOUSE_POS):
+                        main_menu()
         pygame.display.update()
 
 def show_go_screen():
+    pygame.mixer.music.load('SpaceMenu.mp3')
+    pygame.mixer.music.set_volume(0.5)
+    pygame.mixer.music.play()
     waiting = True
     while waiting: 
         #file = open('Highscores.txt', 'r')
@@ -485,7 +493,7 @@ def show_go_screen():
                     #highscore = str(line.replace('highscore: ', '')) 
             #str(highscore)
         GO_SCREEN_MOUSE_POS = pygame.mouse.get_pos()
-
+        left, middle, right = pygame.mouse.get_pressed()    
         SCREEN.blit(HS, (0, 0))
         GAMEOVER_TEXT = get_font(40).render("GAME OVER ", True, "White")
         MANUAL_TEXT = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
@@ -521,8 +529,10 @@ def show_go_screen():
                 if event.key == pygame.K_SPACE:
                     waiting = False         
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if GO_SCREEN_BACK.checkForInput(GO_SCREEN_MOUSE_POS):
-                    main_menu()
+                mouse_presses = pygame.mouse.get_pressed()
+                if mouse_presses[0]:
+                    if GO_SCREEN_BACK.checkForInput(GO_SCREEN_MOUSE_POS):
+                        main_menu()
                         
         pygame.display.update()
    
@@ -566,6 +576,7 @@ def options_menu():
 
         SCREEN.blit(HS, (0, 0))
         OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+        left, middle, right = pygame.mouse.get_pressed()
         OPTIONS_TEXT = get_font(40).render("options ", True, "White")
         OPTIONS_TEXT2 = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         #OPTIONS_TEXT = get_font(40).render("options ", True, "White")
@@ -597,12 +608,14 @@ def options_menu():
                     pygame.quit()
                     sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if OPTIONS_MUSICON.checkForInput(OPTIONS_MOUSE_POS):
-                    pygame.mixer.music.unpause()
-                if OPTIONS_MUSICOFF.checkForInput(OPTIONS_MOUSE_POS):
-                    pygame.mixer.music.pause()	
-                if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
-                        main_menu()
+                    mouse_presses = pygame.mouse.get_pressed()
+                    if mouse_presses[0]:
+                        if OPTIONS_MUSICON.checkForInput(OPTIONS_MOUSE_POS):
+                            pygame.mixer.music.unpause()
+                        if OPTIONS_MUSICOFF.checkForInput(OPTIONS_MOUSE_POS):
+                            pygame.mixer.music.pause()	
+                        if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                            main_menu()
         pygame.display.update()
 
 def main_menu():
@@ -611,7 +624,7 @@ def main_menu():
         SCREEN.blit(BG, (0, 0))
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
-
+        left, middle, right = pygame.mouse.get_pressed()
         MENU_TEXT = get_font(75).render("MAIN MENU", True, "#940076")
         MENU_RECT = MENU_TEXT.get_rect(center=(500, 100))
 
@@ -635,6 +648,7 @@ def main_menu():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
+<<<<<<< HEAD
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play_game()
                 if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
@@ -644,5 +658,24 @@ def main_menu():
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
+=======
+                mouse_presses = pygame.mouse.get_pressed()
+                if mouse_presses[0]:
+                    if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.mixer.music.set_volume(1)
+                        pygame.mixer.Channel(6).play(pygame.mixer.Sound('Select.mp3'))
+                        play_game()
+                    if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.mixer.music.set_volume(1)
+                        pygame.mixer.Channel(6).play(pygame.mixer.Sound('Select.mp3'))
+                        options_menu()
+                    if HIGHSCORE_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.mixer.music.set_volume(1)
+                        pygame.mixer.Channel(6).play(pygame.mixer.Sound('Select.mp3'))
+                        highscores()
+                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.quit()
+                        sys.exit()
+>>>>>>> 37099451ebea9d13b3e4723ec2d602a63d224fe6
         pygame.display.update()   
 main_menu()
