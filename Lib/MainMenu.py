@@ -5,7 +5,7 @@ import random
 import math
 from os import path
 
-
+#Game initiation
 pygame.init()
 pygame.mixer.init
 pygame.mixer.music.load('SpaceMenu.mp3')
@@ -17,11 +17,21 @@ SCREEN = pygame.display.set_mode((1000, 500))
 pygame.display.set_caption("Space Invaders")
 BLACK = (0, 0, 0)
 BG = pygame.image.load("Lib/img/space.png")
+BG_G = pygame.image.load("Lib/img/BG_still.jpg")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
 BG = pygame.transform.scale(BG, (1500, 1000))
+BG_G = pygame.transform.scale(BG_G, (1000, 500))
 HS = pygame.transform.scale(HS, (1000, 500))
 rect = HS.get_rect()
 rect = rect.move((0, 0))
+rect2 = BG_G.get_rect()
+rect2 = rect2.move((0, 0))
+
+file = open('Highscores.txt', 'r')
+for line in file:
+    if 'highscore: ' in line:
+        highscore = int(line.replace('highscore: ', ''))
+        saved_highscore = 0
 
 def draw_text(surf, text, size, x, y):
             font = pygame.font.Font(get_font, size)
@@ -37,6 +47,7 @@ def play_game():
     pygame.mixer.music.load('SpaceGame.mp3')
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play()
+    global highscore
     while True:
         img_dir = path.join(path.dirname(__file__), "img")
 
@@ -120,12 +131,12 @@ def play_game():
             def shoot(self):
                 now = pygame.time.get_ticks()
                 pygame.mixer.music.set_volume(1)
-                pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
                 if now - self.last_bullet > self.bullet_delay:
                     self.last_bullet = now
                     bullet = Bullets(self.rect.right, self.rect.centery)
                     all_sprites.add(bullet)
                     bullets.add(bullet)
+                    pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
 
         # Enemie fighters
         class Enemies(pygame.sprite.Sprite):
@@ -254,7 +265,6 @@ def play_game():
         # initialize score
         score = 0
         previous_score = 0
-        highscore = 0
         saved_highscore = 0
         file = open('Highscores.txt', 'r')
         for line in file:
@@ -264,7 +274,7 @@ def play_game():
 
         # Load All game graphics
         #Background
-        background = pygame.image.load(path.join(img_dir, "space.png")).convert()
+        background = pygame.image.load(path.join(img_dir, "Background.png")).convert()
         background_rect = background.get_rect()
         bg_width = background.get_width()
         scroll = 0
@@ -438,7 +448,8 @@ def play_game():
         pygame.quit()
         pygame.display.update() 
 
-def highscores():  
+def highscores():
+    global highscore  
     while True:
         SCREEN.blit(HS, (0, 0))
         HIGHSCORE_MOUSE_POS = pygame.mouse.get_pos()
@@ -448,15 +459,15 @@ def highscores():
             if 'highscore: ' in line:
                 highscore = str(line.replace('highscore: ', '')) 
         str(highscore)
-        HIGHSCORE_TEXT = get_font(40).render("Your Highscore is ", True, "White")
+        HIGHSCORE_TEXT = get_font(70).render("Your Highscore is ", True, "White")
 
         HIGHSCORE_RECT = HIGHSCORE_TEXT.get_rect(center=(500, 130))
         SCREEN.blit(HIGHSCORE_TEXT, HIGHSCORE_RECT)
 
-        HIGHSCORE_BACK = Button(image=None, pos=(500, 250), 
-            text_input="BACK", font=get_font(25), base_color="White", hovering_color="Green")
-        HIGHSCORE_SCORE = Button(image=None, pos=(500, 200), 
-            text_input=str(highscore), font=get_font(50), base_color="White", hovering_color="Green")
+        HIGHSCORE_BACK = Button(image=None, pos=(500, 400), 
+            text_input="BACK", font=get_font(50), base_color="White", hovering_color="Green")
+        HIGHSCORE_SCORE = Button(image=None, pos=(500, 250), 
+            text_input=str(highscore), font=get_font(100), base_color="RED", hovering_color="Green")
 
         HIGHSCORE_BACK.changeColor(HIGHSCORE_MOUSE_POS)
         HIGHSCORE_BACK.update(SCREEN)
@@ -475,16 +486,17 @@ def highscores():
         pygame.display.update()
 
 def show_go_screen():
+    global highscore
     pygame.mixer.music.load('SpaceMenu.mp3')
     pygame.mixer.music.set_volume(0.5)
     pygame.mixer.music.play()
     waiting = True
     while waiting: 
-        #file = open('Highscores.txt', 'r')
-        #for line in file:
-            #if 'highscore: ' in line:
-                #saved_highscore = str(line.replace('highscore: ', '')) 
-        #str(saved_highscore)
+        file = open('Highscores.txt', 'r')
+        for line in file:
+            if 'highscore: ' in line:
+                highscore = str(line.replace('highscore: ', '')) 
+        str(highscore)
         GO_SCREEN_MOUSE_POS = pygame.mouse.get_pos()
         left, middle, right = pygame.mouse.get_pressed()    
         SCREEN.blit(HS, (0, 0))
@@ -492,19 +504,19 @@ def show_go_screen():
         MANUAL_TEXT = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         HS_TEXT = get_font(40).render("Press SPACE to continue ", True, "White")
         HS2_TEXT = get_font(40).render("Your highscore   = ", True, "White")
-        #SCORE_TEXT = get_font(40).render(str(saved_highscore), True, "White")
+        SCORE_TEXT = get_font(40).render(str(highscore), True, "#ff0000")
 
         GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 150))
         MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 300))
         HS_RECT = HS_TEXT.get_rect(center=(500, 400))
-        HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
-        #SCORE_RECT = SCORE_TEXT.get_rect(center=(500, 130))
+        HS2_RECT = HS2_TEXT.get_rect(center=(450, 250))
+        SCORE_RECT = SCORE_TEXT.get_rect(center=(700, 250))
 
         SCREEN.blit(GAMEOVER_TEXT, GAMEOVER_RECT)
         SCREEN.blit(MANUAL_TEXT, MANUAL_RECT)
         SCREEN.blit(HS_TEXT, HS_RECT)
         SCREEN.blit(HS2_TEXT, HS2_RECT)
-        #SCREEN.blit(SCORE_TEXT, SCORE_RECT)
+        SCREEN.blit(SCORE_TEXT, SCORE_RECT)
 
         
 
@@ -577,21 +589,21 @@ def options_menu():
 def main_menu():
     while True:
 
-        SCREEN.blit(BG, (0, 0))
+        SCREEN.blit(BG_G, (0, 0))
 
         MENU_MOUSE_POS = pygame.mouse.get_pos()
         left, middle, right = pygame.mouse.get_pressed()
-        MENU_TEXT = get_font(75).render("MAIN MENU", True, "#940076")
+        MENU_TEXT = get_font(75).render("MAIN MENU", True, "Purple")
         MENU_RECT = MENU_TEXT.get_rect(center=(500, 100))
 
-        PLAY_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(200, 200), 
-                            text_input="PLAY", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
-        HIGHSCORE_BUTTON = Button(image=pygame.image.load("Lib/img/highscore Rect.png"), pos=(700, 200), 
-                            text_input="HIGHSCORE", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
-        QUIT_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(700, 400), 
-                            text_input="QUIT", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
-        OPTIONS_BUTTON = Button(image=pygame.image.load("Lib/img/Quit Rect.png"), pos=(200, 400), 
-                            text_input="OPTIONS", font=get_font(40), base_color="#fcd4f4", hovering_color="Purple")
+        PLAY_BUTTON = Button(image=pygame.image.load("Lib/img/Play Button.png"), pos=(333, 250), 
+                            text_input="PLAY", font=get_font(35), base_color="#fcd4f4", hovering_color="Purple")
+        HIGHSCORE_BUTTON = Button(image=pygame.image.load("Lib/img/Play Button.png"), pos=(666, 250), 
+                            text_input="HIGHSCORE", font=get_font(35), base_color="#fcd4f4", hovering_color="Purple")
+        QUIT_BUTTON = Button(image=pygame.image.load("Lib/img/Play Button.png"), pos=(655, 400), 
+                            text_input="QUIT", font=get_font(35), base_color="#fcd4f4", hovering_color="Purple")
+        OPTIONS_BUTTON = Button(image=pygame.image.load("Lib/img/Play Button.png"), pos=(333, 400), 
+                            text_input="OPTIONS", font=get_font(35), base_color="#fcd4f4", hovering_color="Purple")
 
         SCREEN.blit(MENU_TEXT, MENU_RECT)
 
