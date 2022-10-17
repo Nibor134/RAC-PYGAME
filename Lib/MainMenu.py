@@ -483,27 +483,27 @@ def show_go_screen():
         #file = open('Highscores.txt', 'r')
         #for line in file:
             #if 'highscore: ' in line:
-                    #highscore = str(line.replace('highscore: ', '')) 
-            #str(highscore)
+                #saved_highscore = str(line.replace('highscore: ', '')) 
+        #str(saved_highscore)
         GO_SCREEN_MOUSE_POS = pygame.mouse.get_pos()
         left, middle, right = pygame.mouse.get_pressed()    
         SCREEN.blit(HS, (0, 0))
         GAMEOVER_TEXT = get_font(80).render("GAME OVER ", True, "#ff0000")
         MANUAL_TEXT = get_font(40).render("Arrow keys to move, Space to Fire ", True, "White")
         HS_TEXT = get_font(40).render("Press SPACE to continue ", True, "White")
-        #HS2_TEXT = get_font(40).render("Your highscore   = ", True, "White")
-        #SCORE_TEXT = get_font(40).render(str(highscore), True, "White")
+        HS2_TEXT = get_font(40).render("Your highscore   = ", True, "White")
+        #SCORE_TEXT = get_font(40).render(str(saved_highscore), True, "White")
 
         GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 150))
         MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 300))
         HS_RECT = HS_TEXT.get_rect(center=(500, 400))
-        #HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
+        HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
         #SCORE_RECT = SCORE_TEXT.get_rect(center=(500, 130))
 
         SCREEN.blit(GAMEOVER_TEXT, GAMEOVER_RECT)
         SCREEN.blit(MANUAL_TEXT, MANUAL_RECT)
         SCREEN.blit(HS_TEXT, HS_RECT)
-        #SCREEN.blit(HS2_TEXT, HS2_RECT)
+        SCREEN.blit(HS2_TEXT, HS2_RECT)
         #SCREEN.blit(SCORE_TEXT, SCORE_RECT)
 
         
