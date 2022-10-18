@@ -142,8 +142,8 @@ def play_game():
         class Enemies(pygame.sprite.Sprite):
             def __init__(self):
                 pygame.sprite.Sprite.__init__(self)
-                self.image = enemie_img
-                self.image = pygame.transform.scale(enemie_img, (55,45))
+                self.image = random.choice(enemy_images)
+                self.image = pygame.transform.scale(self.image, (70,80))
                 self.image.set_colorkey(BLACK)
                 self.rect = self.image.get_rect()
                 self.radius = int(self.rect.width * .85 / 2)
@@ -152,7 +152,7 @@ def play_game():
                 self.rect.x = random.randrange(990, 1000)
                 self.rect.y = random.randrange(0, HEIGHT - self.rect.height)
                 self.speedy = random.randrange(-3, 3)
-                self.speedx = random.randrange(-12, -5)
+                self.speedx = random.randrange(-10, -5)
 
             # killing and spawning new enemies when they go of the screen
             def update(self):
@@ -281,11 +281,18 @@ def play_game():
         tiles = math.ceil(WIDTH / bg_width) + 1
 
         # Player and Enemies and meteors
-        player_img = pygame.image.load(path.join(img_dir, "Player 1.png")).convert()
+        player_img = pygame.image.load(path.join(img_dir, "Player1.png")).convert()
         player_lives_img = pygame.transform.scale(player_img, (40, 29))
         player_lives_img.set_colorkey(BLACK)
-        enemie_img = pygame.image.load(path.join(img_dir, "enemyRed2.png")).convert()
+        #enemie_img = pygame.image.load(path.join(img_dir, "enemyRed2.png")).convert()
+        #enemie2_img = pygame.image.load(path.join(img_dir, "enemyPurple1.png")).convert()
         bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
+
+        #Random Enemy image
+        enemy_images = []
+        enemy_list = ["enemyRed2.png","enemyPurple1.png", "Enemy 1.png"]
+        for img in enemy_list:
+            enemy_images.append(pygame.image.load(path.join(img_dir, img)).convert())
 
         # Random meteor image
         meteor_images = []
