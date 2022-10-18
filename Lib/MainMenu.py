@@ -54,6 +54,7 @@ def play_game():
         WIDTH = 1000
         HEIGHT = 500
         FPS = 60
+        POWERUP_TIME = 3000
 
         # Colors
         WHITE = (255, 255, 255)
@@ -98,8 +99,19 @@ def play_game():
                 self.bullet_delay = 250
                 self.last_bullet = pygame.time.get_ticks()
                 self.lives = 3
+                self.power = 1
+                self.power_time = pygame.time.get_ticks()
+                self.powbullet_delay = 50
+                self.collision_time = pygame.time.get_ticks()
+                self.collision_imune = True
+
                 
             def update(self):
+                # Check if powerup is active
+                if self.power >= 2 and pygame.time.get_ticks() - self.power_time > POWERUP_TIME:
+                    self.power -= 1
+                    self.power_time = pygame.time.get_ticks()
+
                 # Player movement with arrow keys
                 self.speedx = 0
                 self.speedy = 0
@@ -115,7 +127,7 @@ def play_game():
                 self.rect.x += self.speedx
                 self.rect.y += self.speedy
                 if keystate[pygame.K_SPACE]:
-                    self.shoot()
+                    self.shoot() or self.powshoot()
 
             # Creating Borders for the player so it can't go of the screen
                 if self.rect.right > WIDTH:
@@ -126,18 +138,32 @@ def play_game():
                     self.rect.top = 0
                 if self.rect.bottom > HEIGHT:
                     self.rect.bottom = HEIGHT
+            
+            # gun powerup
+            def gunpow(self):
+                self.power += 1
+                self.power_time = pygame.time.get_ticks()
 
             # Shoot bullets button
             def shoot(self):
                 now = pygame.time.get_ticks()
-                pygame.mixer.music.set_volume(1)
-                if now - self.last_bullet > self.bullet_delay:
-                    self.last_bullet = now
-                    bullet = Bullets(self.rect.right, self.rect.centery)
-                    all_sprites.add(bullet)
-                    bullets.add(bullet)
-                    pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
-
+                if self.power == 1:
+                    if now - self.last_bullet > self.bullet_delay:
+                        self.last_bullet = now
+                        bullet = Bullets(self.rect.right, self.rect.centery)
+                        all_sprites.add(bullet)
+                        bullets.add(bullet)
+                        pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
+                        
+            def powshoot(self):
+                now = pygame.time.get_ticks()
+                if self.power >= 2:
+                    if now - self.last_bullet > self.powbullet_delay:
+                        self.last_bullet = now
+                        bullet2 = POBullets(self.rect.right, self.rect.centery)
+                        all_sprites.add(bullet2)
+                        bullets.add(bullet2)
+        
         # Enemie fighters
         class Enemies(pygame.sprite.Sprite):
             def __init__(self):
@@ -160,9 +186,7 @@ def play_game():
                 self.rect.y += self.speedy
                 if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
                     self.kill()
-                    new_enemies = Enemies()
-                    all_sprites.add(new_enemies)
-                    enemies.add(new_enemies)
+                    newenemie()
 
         # Creating indestructable meteors that the player has to dodge
         class Meteors(pygame.sprite.Sprite):
@@ -224,7 +248,24 @@ def play_game():
                 # Remove the bullet if it is no longer on the screen
                 if self.rect.right > 1000:
                     self.kill()
-                    
+        
+        class POBullets(pygame.sprite.Sprite):
+            def __init__(self, x, y):
+                pygame.sprite.Sprite.__init__(self)
+                self.image = Powerup_bullet_img
+                self.image.set_colorkey(BLACK)
+                self.rect = self.image.get_rect()
+                self.rect.bottom = y
+                self.rect.centerx = x
+                self.speedy = 0
+                self.speedx = 10
+
+            def update(self):
+                self.rect.x += self.speedx
+                # Remove the bullet if it is no longer on the screen
+                if self.rect.right > 1000:
+                    self.kill()
+
         class Explosion(pygame.sprite.Sprite):
             def __init__(self, center, size):
                 pygame.sprite.Sprite.__init__(self)
@@ -249,6 +290,22 @@ def play_game():
                         self.rect = self.image.get_rect()
                         self.rect.center = center
 
+        class Powerups(pygame.sprite.Sprite):
+            def __init__(self, center):
+                pygame.sprite.Sprite.__init__(self)
+                self.type = random.choice(['better_gun', 'extra_life'])
+                self.image = powerup_images[self.type]
+                self.image.set_colorkey(BLACK)
+                self.rect = self.image.get_rect()
+                self.rect.center = center
+                self.speedx = -2
+
+            def update(self):
+                self.rect.x += self.speedx
+                # Remove the powerup if it is no longer on the screen
+                if self.rect.left < -10:
+                    self.kill()
+
 
         # Show how many lives the player has left in the top left corner using images
         def show_lives(surf, x, y, lives, img):
@@ -256,11 +313,13 @@ def play_game():
                 img_rect = img.get_rect()
                 img_rect.x = x + 30 * i
                 img_rect.y = y
-                surf.blit(img, img_rect)
+                surf.blit(img, img_rect)    
 
-        # Function to pop up game over screen when player dies, Controls
-        #def show_score_screen():
-            #Startscreen.full_game_state == 0       
+        # Quick and easy way to spawn a new enemie       
+        def newenemie():
+            new_enemies = Enemies()
+            all_sprites.add(new_enemies)
+            enemies.add(new_enemies)
 
         # initialize score
         score = 0
@@ -287,12 +346,18 @@ def play_game():
         #enemie_img = pygame.image.load(path.join(img_dir, "enemyRed2.png")).convert()
         #enemie2_img = pygame.image.load(path.join(img_dir, "enemyPurple1.png")).convert()
         bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
+        Powerup_bullet_img = pygame.image.load(path.join(img_dir, "bulletcentreer.png")).convert()
 
         #Random Enemy image
         enemy_images = []
         enemy_list = ["enemyRed2.png","enemyPurple1.png", "Enemy 1.png"]
         for img in enemy_list:
             enemy_images.append(pygame.image.load(path.join(img_dir, img)).convert())
+        
+        # Powerup images
+        powerup_images = {}
+        powerup_images['better_gun'] = pygame.image.load(path.join(img_dir , 'powerupbullett.png')).convert()
+        powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'heartlife.png')).convert()
 
         # Random meteor image
         meteor_images = []
@@ -323,6 +388,7 @@ def play_game():
             all_sprites.add(enemies_jets)
             enemies.add(enemies_jets) 
         player = Player()
+        powerups = pygame.sprite.Group()
         all_sprites.add(player)
         meteor = pygame.sprite.Group()
         for i in range(3):
@@ -334,6 +400,8 @@ def play_game():
         running = True
         game_over = False
         while running:
+            if pygame.time.get_ticks() - player.collision_time > 2000:
+                player.collision_imune = False
             if game_over:
                 game_over = False 
                 all_sprites = pygame.sprite.Group()
@@ -376,19 +444,35 @@ def play_game():
             for hit in hits_bullet_enemie:
                 pygame.mixer.music.set_volume(1)
                 pygame.mixer.Channel(3).play(pygame.mixer.Sound('hit.mp3'))
-                score +=1
+                score += 1
                 if (previous_score//50) < (score//50):
                     print('add more', previous_score//50, score//50)
                     more_enemies = Enemies()
                     enemies.add(more_enemies)
                     all_sprites.add(more_enemies)
+
                 # Spawn new enemies when killed by bullet
-                new_enemies = Enemies()
-                all_sprites.add(new_enemies)
-                enemies.add(new_enemies)
+                newenemie()
+
                 # Explosion
                 explosion = Explosion(hit.rect.center, 'big')
                 all_sprites.add(explosion)
+
+                # spawn a powerup
+                if random.random() > 0.9:
+                    power_ups = Powerups(hit.rect.center)
+                    all_sprites.add(power_ups)
+                    powerups.add(power_ups)
+
+                # Check to see if player picked up powerup
+            hits_player_powerup = pygame.sprite.spritecollide(player, powerups, True)
+            for hit in hits_player_powerup:
+                if hit.type == 'extra_life':
+                    pygame.mixer.Channel(4).play(pygame.mixer.Sound('ExtraLife.mp3'))
+                    player.lives += 1
+                if hit.type == 'better_gun':
+                    pygame.mixer.Channel(4).play(pygame.mixer.Sound('Powerup.mp3'))
+                    player.gunpow()
 
             # Check to see if bullet hit meteor
             hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
@@ -403,25 +487,33 @@ def play_game():
             for hit in hits_player_enemie:
                 pygame.mixer.music.set_volume(1)
                 pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
-                player.lives -=1
-                player.rect.centerx = WIDTH / 100
-                player.rect.bottom = HEIGHT / 2
-                # Respawn an enemie when it hit the player
-                new_enemies = Enemies()
-                all_sprites.add(new_enemies)
-                enemies.add(new_enemies)
+                if player.collision_imune == False:
+                    for hit in hits_player_enemie:
+                        player.lives -=1
+                        player.rect.centerx = WIDTH / 100
+                        player.rect.bottom = HEIGHT / 2
+                        player.collision_imune = True
+                        player.collision_time = pygame.time.get_ticks()
+                    # Respawn an enemie when it hit the player
+                        newenemie()
 
             # Check to see if meteor hit the player
             hits_player_meteors = pygame.sprite.spritecollide(player, meteor, True, pygame.sprite.collide_circle)
             if hits_player_meteors:
-
-                player.rect.centerx = WIDTH / 100
-                player.rect.bottom = HEIGHT / 2
-                player.lives -= 1
-                # Respawn a meteor when it hit the player
-                new_meteors = Meteors()
-                all_sprites.add(new_meteors)
-                meteor.add(new_meteors)
+                for hit in hits_player_meteors:
+                        new_meteors = Meteors()
+                        all_sprites.add(new_meteors)
+                        meteor.add(new_meteors)
+                        if player.collision_imune == False:
+                            player.lives -= 1
+                            player.rect.centerx = WIDTH / 100
+                            player.rect.bottom = HEIGHT / 2
+                            player.collision_imune = True
+                            player.collision_time = pygame.time.get_ticks()
+                        # Respawn a meteor when it hit the player
+                            new_meteors = Meteors()
+                            all_sprites.add(new_meteors)
+                            meteor.add(new_meteors)
             
             elif player.lives == 0:
                 pygame.mixer.Channel(8).play(pygame.mixer.Sound('death.mp3'))
