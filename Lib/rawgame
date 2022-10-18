@@ -1,5 +1,4 @@
 # Shoot 'em up game 
-from turtle import left
 import pygame
 import random
 from os import path
@@ -11,12 +10,11 @@ img_dir = path.join(path.dirname(__file__), "img")
 WIDTH = 1000
 HEIGHT = 500
 FPS = 60
-POWERUP_TIME = 5000   
+POWERUP_TIME = 3000
 
-   
 # Colors
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)         
+BLACK = (0, 0, 0)
 RED = (255, 0 , 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
@@ -28,11 +26,20 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space liberators")
 clock = pygame.time.Clock()
 
+# Display text in game over screen, Font use in game, location
+font_name = pygame.font.match_font('impact')
+def draw_text(surf, text, size, x, y):
+    font = pygame.font.Font(font_name, size)
+    text_surface = font.render(text, True, WHITE)
+    text_rect = text_surface.get_rect()
+    text_rect.midtop = (x, y)
+    surf.blit(text_surface, text_rect)
+    
 # Create player
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.transform.scale(player_img, (80,60))
+        self.image = pygame.transform.scale(player_img,(60,40))
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.radius = 24
@@ -45,29 +52,21 @@ class Player(pygame.sprite.Sprite):
         self.bullet_delay = 250
         self.last_bullet = pygame.time.get_ticks()
         self.lives = 3
-        #timer on the powerup
-
         self.power = 1
         self.power_time = pygame.time.get_ticks()
-        
-        
-
+        self.powbullet_delay = 0
+        self.collision_time = pygame.time.get_ticks()
+        self.collision_imune = True
 
     def update(self):
-         # Player movement with arrow keys
-        
-        #timout for powerups 
+        # Check if powerup is active
         if self.power >= 2 and pygame.time.get_ticks() - self.power_time > POWERUP_TIME:
             self.power -= 1
             self.power_time = pygame.time.get_ticks()
-        
-        self.rect.center = pygame.mouse.get_pos()
-        #If u turn activate the code above , u will be able to move the spaceship with ur mouse instead of the keys
+
+        # Player movement with arrow keys
         self.speedx = 0
         self.speedy = 0
-        
-
-        
         keystate = pygame.key.get_pressed()
         if keystate[pygame.K_LEFT]:
             self.speedx = -5
@@ -79,13 +78,10 @@ class Player(pygame.sprite.Sprite):
             self.speedy = 5
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        
         if keystate[pygame.K_SPACE]:
-            self.shoot()
+            self.shoot() or self.powshoot()
 
-        
-        
-       # Creating Borders for the player so it can't go of the screen
+    # Creating Borders for the player so it can't go of the screen
         if self.rect.right > WIDTH:
             self.rect.right = WIDTH
         if self.rect.left < 0:
@@ -95,35 +91,33 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom > HEIGHT:
             self.rect.bottom = HEIGHT
 
-# 
-    def powerup(self):
+    # gun powerup
+    def gunpow(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
 
-    # Shoot bullets button , and the powerup bullets
+    # Shoot bullets button
     def shoot(self):
         now = pygame.time.get_ticks()
-        if now - self.last_bullet > self.bullet_delay:
-            self.last_bullet = now
-            if self.power == 1 : 
-                bullet = Bullets(self.rect.centerx, self.rect.top)
+        if self.power == 1:
+            if now - self.last_bullet > self.bullet_delay:
+                self.last_bullet = now
+                bullet = Bullets(self.rect.right, self.rect.centery)
                 all_sprites.add(bullet)
                 bullets.add(bullet)
-  
-            
-        
-            if self.power >= 2 :
-                bullet1 = Bullets(self.rect.left, self.rect.centery)
+    
+    # Shoot bullets button if powerup is active
+    def powshoot(self):
+        now = pygame.time.get_ticks()
+        if self.power >= 2:
+            if now - self.last_bullet > self.powbullet_delay:
+                self.last_bullet = now
                 bullet2 = Bullets(self.rect.right, self.rect.centery)
-                all_sprites.add(bullet1)
                 all_sprites.add(bullet2)
-                bullets.add(bullet1)
                 bullets.add(bullet2)
-            
 
 # Enemie fighters
 class Enemies(pygame.sprite.Sprite):
-
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = enemie_img
@@ -138,15 +132,42 @@ class Enemies(pygame.sprite.Sprite):
         self.speedy = random.randrange(-3, 3)
         self.speedx = random.randrange(-12, -5)
 
-    # killing and spawning new enemies when they go of the screen
     def update(self):
+        # killing and spawning new enemies when they go of the screen
         self.rect.x += self.speedx
         self.rect.y += self.speedy
         if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 50 or self.rect.bottom > 530:
             self.kill()
-            new_enemies = Enemies()
-            all_sprites.add(new_enemies)
-            enemies.add(new_enemies)
+            newenemie()
+
+# Enemie sharks
+class Sharks(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = shark_img
+        self.image = pygame.transform.scale(shark_img, (80,60))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * .85 / 2)
+        # Make the hitbox visible --->
+        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
+        self.rect.x = 900
+        self.rect.y = 500
+        self.speedy = (-3)
+        self.speedx = (-5)
+
+    def update(self):
+        if self.rect.x == 500:
+            self.speedy = 2
+            self.rect.y -= self.speedy
+        self.rect.y += self.speedy
+        self.rect.x += self.speedx
+        # killing and spawning new enemies when they go of the screen
+        if self.rect.top < -30 or self.rect.left < WIDTH - 1030  or self.rect.right > WIDTH + 150 or self.rect.bottom > 700:
+            self.kill()
+            new_sharks = Sharks()
+            all_sprites.add(new_sharks)
+            sharks.add(new_sharks)
 
 # Creating indestructable meteors that the player has to dodge
 class Meteors(pygame.sprite.Sprite):
@@ -185,7 +206,7 @@ class Meteors(pygame.sprite.Sprite):
         self.rotate()
         self.rect.x += self.speedx
         self.rect.y += self.speedy
-        if self.rect.top < -50 or self.rect.left < WIDTH - 1100  or self.rect.right > WIDTH + 100 or self.rect.bottom > 530:
+        if self.rect.top < -60 or self.rect.left < WIDTH - 1150  or self.rect.right > WIDTH + 100 or self.rect.bottom > 560:
             self.kill()
             new_meteors = Meteors()
             all_sprites.add(new_meteors)
@@ -193,9 +214,8 @@ class Meteors(pygame.sprite.Sprite):
             
 # bullets
 class Bullets(pygame.sprite.Sprite):
-
     def __init__(self, x, y):
-        pygame.sprite.Sprite.__init__(self) 
+        pygame.sprite.Sprite.__init__(self)
         self.image = bullet_img
         self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
@@ -208,26 +228,6 @@ class Bullets(pygame.sprite.Sprite):
         self.rect.x += self.speedx
         # Remove the bullet if it is no longer on the screen
         if self.rect.right > 1000:
-            self.kill()
-
-#Powerups
-
-class Pow(pygame.sprite.Sprite):
-
-    def __init__(self, center):
-        pygame.sprite.Sprite.__init__(self) 
-        self.type = random.choice(['shield', 'gun'])
-        self.image = power_images[self.type]
-        self.image.set_colorkey(BLACK)
-        self.rect = self.image.get_rect()  
-        self.rect.center = center
-        self.speedy = 0
-        self.speedx = -3
-
-    def update(self):
-        self.rect.x += self.speedx
-        # Remove the bullet if it is no longer on the screen
-        if self.rect.top > HEIGHT:
             self.kill()
             
 class Explosion(pygame.sprite.Sprite):
@@ -254,6 +254,21 @@ class Explosion(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
+class Powerups(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.type = random.choice(['better_gun', 'extra_life'])
+        self.image = powerup_images[self.type]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.speedx = -2
+
+    def update(self):
+        self.rect.x += self.speedx
+        # Remove the powerup if it is no longer on the screen
+        if self.rect.left < -10:
+            self.kill()
 
 # Show how many lives the player has left in the top left corner using images
 def show_lives(surf, x, y, lives, img):
@@ -263,19 +278,26 @@ def show_lives(surf, x, y, lives, img):
         img_rect.y = y
         surf.blit(img, img_rect)
 
+# Quick and easy way to spawn a new enemie
+def newenemie():
+    new_enemies = Enemies()
+    all_sprites.add(new_enemies)
+    enemies.add(new_enemies)
+
 # Load All game graphics
 #Background
-background = pygame.image.load(path.join(img_dir, "space.png")).convert()
+background = pygame.image.load(path.join(img_dir, "platformback.png.tiff")).convert()
 background_rect = background.get_rect()
 bg_width = background.get_width()
 scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 1
-# Player and Enemies and meteors
-player_img = pygame.image.load(path.join(img_dir, "playership.png")).convert()
+# Player and Enemies and bullets and sharks
+shark_img = pygame.image.load(path.join(img_dir, "sharkie2.png")).convert()
+player_img = pygame.image.load(path.join(img_dir, "playership1_blue.png")).convert()
 player_lives_img = pygame.transform.scale(player_img, (40, 29))
 player_lives_img.set_colorkey(BLACK)
-enemie_img = pygame.image.load(path.join(img_dir, "enemyRed1.png")).convert()    
-bullet_img = pygame.image.load(path.join(img_dir, "bulletverkleint.png")).convert()
+enemie_img = pygame.image.load(path.join(img_dir, "Spaceship.png")).convert()
+bullet_img = pygame.image.load(path.join(img_dir, "laserRed07.png")).convert()
 # Random meteor image
 meteor_images = []
 meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png']
@@ -294,18 +316,22 @@ for i in range (9):
     explosion_img['big'].append(img_big)
     img_small = pygame.transform.scale(img, (32, 32))
     explosion_img['small'].append(img_small)
-
-#Powerup Images
-power_images = {}
-power_images['shield'] = pygame.image.load(path.join(img_dir, 'heartlife.png')).convert()
-power_images['gun'] = pygame.image.load(path.join(img_dir, 'powerupbullett.png')).convert()
+# Powerup images
+powerup_images = {}
+powerup_images['better_gun'] = pygame.image.load(path.join(img_dir , 'bettergun.png')).convert()
+powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'extralife.png')).convert()
 
 # All sprites 
 all_sprites = pygame.sprite.Group()
-bullets = pygame.sprite.Group()
-enemies = pygame.sprite.Group() 
+sharks = pygame.sprite.Group()
+for i in range(1):
+    sharkies = Sharks()
+    all_sprites.add(sharkies)
+    sharks.add(sharkies)
 powerups = pygame.sprite.Group()
-for i in range(8):
+bullets = pygame.sprite.Group()
+enemies = pygame.sprite.Group()
+for i in range(6):
     enemies_jets = Enemies()
     all_sprites.add(enemies_jets)
     enemies.add(enemies_jets) 
@@ -317,11 +343,18 @@ for i in range(3):
     all_sprites.add(meteors)
     meteor.add(meteors)
 
+# initialize score
+score = 0
+
 # Game loop
 running = True
 while running:
     # keep loop running at the right speed
     clock.tick(FPS)
+
+    # Make the player invincible when they spawn so they don't die instantly
+    if pygame.time.get_ticks() - player.collision_time > 2000:
+        player.collision_imune = False
 
     # Moving background
     for i in range (0, tiles):
@@ -339,21 +372,39 @@ while running:
         
     # update
     all_sprites.update()
+
+    # Get score in order to increase difficulty
+    previous_score = score
+
     # Check to see if bullet hits an enemie
     hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
     for hit in hits_bullet_enemie:
+        # Add score and make the game more difficult
+        score += 1
+        if (previous_score//50) < (score//50):
+            print('add more', previous_score//50, score//50)
+            more_enemies = Enemies()
+            enemies.add(more_enemies)
+            all_sprites.add(more_enemies)
+
         # Spawn new enemies when killed by bullet
-        new_enemies = Enemies()
-        all_sprites.add(new_enemies)
-        enemies.add(new_enemies)
+        newenemie()
         # Explosion
         explosion = Explosion(hit.rect.center, 'big')
         all_sprites.add(explosion)
-        if random.random() > 0.9:
-            pow = Pow(hit.rect.center)
-            all_sprites.add(pow)
-            powerups.add(pow)
-        
+        # spawn a powerup
+        if random.random() > 0.93:
+            power_ups = Powerups(hit.rect.center)
+            all_sprites.add(power_ups)
+            powerups.add(power_ups)
+
+    # Check to see if player picked up powerup
+    hits_player_powerup = pygame.sprite.spritecollide(player, powerups, True)
+    for hit in hits_player_powerup:
+        if hit.type == 'extra_life':
+            player.lives += 1
+        if hit.type == 'better_gun':
+            player.gunpow()
 
     # Check to see if bullet hit meteor
     hits_bullet_meteor = pygame.sprite.groupcollide(meteor, bullets, False, True)
@@ -364,45 +415,43 @@ while running:
     # Check to see if enemie hit the player
     hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
     for hit in hits_player_enemie:
-        player.lives -=1
-        player.rect.centerx = WIDTH / 100
-        player.rect.bottom = HEIGHT / 2
-        # Respawn an enemie when it hit the player
-        new_enemies = Enemies()
-        all_sprites.add(new_enemies)
-        enemies.add(new_enemies)
-
-#Check to see if a player hit a powerup 
-    hits = pygame.sprite.spritecollide(player, powerups, True)
-    for hit in hits:
-
-        if hit.type == 'shield' :
-            player.lives += 1
-            if player.lives >= 100:
-                player.lives = 100
-
-        if hit.type == 'gun' :
-            player.powerup       
-
+        newenemie()
+    if player.collision_imune == False:
+        if hits_player_enemie:
+            for hit in hits_player_enemie:
+                player.lives -=1
+                player.rect.centerx = WIDTH / 100
+                player.rect.bottom = HEIGHT / 2
+                player.collision_imune = True
+                player.collision_time = pygame.time.get_ticks()
+            # Respawn an enemie when it hit the player
+                newenemie()
 
     # Check to see if meteor hit the player
     hits_player_meteors = pygame.sprite.spritecollide(player, meteor, True, pygame.sprite.collide_circle)
-    if hits_player_meteors:
-        player.rect.centerx = WIDTH / 100
-        player.rect.bottom = HEIGHT / 2
-        player.lives -= 1
-        # Respawn a meteor when it hit the player
+    for hit in hits_player_meteors:
         new_meteors = Meteors()
         all_sprites.add(new_meteors)
         meteor.add(new_meteors)
+        if player.collision_imune == False:
+            player.lives -= 1
+            player.rect.centerx = WIDTH / 100
+            player.rect.bottom = HEIGHT / 2
+            player.collision_imune = True
+            player.collision_time = pygame.time.get_ticks()
+        # Respawn a meteor when it hit the player
+            new_meteors = Meteors()
+            all_sprites.add(new_meteors)
+            meteor.add(new_meteors)
         
-    elif player.lives == 0:
-         running = False
+    if player.lives == 0:
+        running = False
 
-    # Draw / render
+    # Draw on screen
     all_sprites.draw(screen)
     show_lives(screen, WIDTH - 1000, 5, player.lives, player_lives_img)
+    draw_text(screen, str(score), 18, WIDTH / 2, 10)
     # Flip the display
     pygame.display.flip()
 
-pygame.quit()
+pygame.quit()  
