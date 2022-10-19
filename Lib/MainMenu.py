@@ -46,6 +46,7 @@ def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("Lib/img/NeoTechItalic-WyKZY.ttf", size)
 
 def play_game():
+    pygame.mixer.Channel(7)
     pygame.mixer.music.load('SpaceGame.mp3')
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play()
@@ -739,9 +740,12 @@ def options_menu():
                     mouse_presses = pygame.mouse.get_pressed()
                     if mouse_presses[0]:
                         if OPTIONS_MUSICON.checkForInput(OPTIONS_MOUSE_POS):
+                            OPTIONS_MUSICON = Button(image=None, pos=(700, 250), 
+                            text_input="MUSIC ON", font=get_font(25), base_color="Black", hovering_color="Red") 
                             pygame.mixer.music.unpause()
                         if OPTIONS_MUSICOFF.checkForInput(OPTIONS_MOUSE_POS):
-                            pygame.mixer.music.pause()	
+                            pygame.mixer.music.pause()
+                            pygame.mixer.Channel(6).pause()	
                         if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                             main_menu()
         pygame.display.update()
