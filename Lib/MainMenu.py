@@ -1,9 +1,10 @@
-
 import pygame, sys
 from button import Button
 import random
 import math
 from os import path
+
+
 
 #Game initiation
 pygame.init()
@@ -20,6 +21,7 @@ BG = pygame.image.load("Lib/img/space.png")
 BG_G = pygame.image.load("Lib/img/BG_still.jpg")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
 BG = pygame.transform.scale(BG, (1500, 1000))
+
 BG_G = pygame.transform.scale(BG_G, (1000, 500))
 HS = pygame.transform.scale(HS, (1000, 500))
 rect = HS.get_rect()
@@ -44,6 +46,7 @@ def get_font(size): # Returns Press-Start-2P in the desired size
     return pygame.font.Font("Lib/img/NeoTechItalic-WyKZY.ttf", size)
 
 def play_game():
+    pygame.mixer.Channel(7)
     pygame.mixer.music.load('SpaceGame.mp3')
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play()
@@ -147,6 +150,15 @@ def play_game():
             # Shoot bullets button
             def shoot(self):
                 now = pygame.time.get_ticks()
+
+                pygame.mixer.music.set_volume(1)
+                pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
+                if now - self.last_bullet > self.bullet_delay:
+                    self.last_bullet = now
+                    bullet = Bullets(self.rect.right, self.rect.centery)
+                    all_sprites.add(bullet)
+                    bullets.add(bullet)
+
                 if self.power == 1:
                     if now - self.last_bullet > self.bullet_delay:
                         self.last_bullet = now
@@ -306,6 +318,30 @@ def play_game():
                 if self.rect.left < -10:
                     self.kill()
 
+        class Planets(pygame.sprite.Sprite):
+            def __init__(self):
+                pygame.sprite.Sprite.__init__(self)
+                self.image_original = random.choice(planet_images)
+                self.image = pygame.transform.scale(self.image_original, (400, 400))
+                self.image.set_colorkey(BLACK)
+                self.rect = self.image.get_rect()
+                self.radius = int(self.rect.width * .93 / 2)
+                # Make the hitbox visible --->
+                # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
+                list_of_cords = [(1000, -250), (1000, 400)]
+                self.rect.x, self.rect.y = random.choice(list_of_cords)
+                self.speedy = 0
+                self.speedx = -2
+
+            def update(self):
+                # killing and spawning new enemies when they go of the screen
+                self.rect.x += self.speedx
+                self.rect.y += self.speedy
+                if self.rect.left < - 1400:
+                    self.kill()
+                    new_planets = Planets()
+                    all_sprites.add(new_planets)
+                    planets.add(new_planets)
 
         # Show how many lives the player has left in the top left corner using images
         def show_lives(surf, x, y, lives, img):
@@ -333,7 +369,7 @@ def play_game():
 
         # Load All game graphics
         #Background
-        background = pygame.image.load(path.join(img_dir, "Background.png")).convert()
+        background = pygame.image.load(path.join(img_dir, "platformback.png.tiff")).convert()
         background_rect = background.get_rect()
         bg_width = background.get_width()
         scroll = 0
@@ -358,6 +394,12 @@ def play_game():
         powerup_images = {}
         powerup_images['better_gun'] = pygame.image.load(path.join(img_dir , 'powerupbullett.png')).convert()
         powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'heartlife.png')).convert()
+
+        # Random planet image
+        planet_images = []
+        planet_list = ['planet.png', 'planet2.png', 'planet4.png']
+        for img in planet_list:
+            planet_images.append(pygame.image.load(path.join(img_dir, img)). convert())
 
         # Random meteor image
         meteor_images = []
@@ -387,6 +429,11 @@ def play_game():
             enemies_jets = Enemies()
             all_sprites.add(enemies_jets)
             enemies.add(enemies_jets) 
+        planets = pygame.sprite.Group()
+        for i in range(1):
+            planet = Planets()
+            all_sprites.add(planet)
+            planets.add(planet)
         player = Player()
         powerups = pygame.sprite.Group()
         all_sprites.add(player)
@@ -439,6 +486,17 @@ def play_game():
         
             # update
             all_sprites.update()
+
+            # Check to see if player hit a planet
+            Hits_player_planet = pygame.sprite.spritecollide(player, planets, False, pygame.sprite.collide_circle)
+            for hit in Hits_player_planet:
+                if player.collision_imune == False:
+                    player.lives -= 1
+                    player.rect.centerx = WIDTH / 100
+                    player.rect.bottom = HEIGHT / 2
+                    player.collision_imune = True
+                    player.collision_time = pygame.time.get_ticks()
+
             # Check to see if bullet hits an enemie
             hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
             for hit in hits_bullet_enemie:
@@ -450,7 +508,6 @@ def play_game():
                     more_enemies = Enemies()
                     enemies.add(more_enemies)
                     all_sprites.add(more_enemies)
-
                 # Spawn new enemies when killed by bullet
                 newenemie()
 
@@ -485,6 +542,7 @@ def play_game():
             # Check to see if enemie hit the player
             hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
             for hit in hits_player_enemie:
+                newenemie()
                 pygame.mixer.music.set_volume(1)
                 pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
                 if player.collision_imune == False:
@@ -608,6 +666,10 @@ def show_go_screen():
         GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 150))
         MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 300))
         HS_RECT = HS_TEXT.get_rect(center=(500, 400))
+
+        #HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
+        #SCORE_RECT = SCORE_TEXT.get_rect(center=(500, 130))
+
         HS2_RECT = HS2_TEXT.get_rect(center=(450, 250))
         SCORE_RECT = SCORE_TEXT.get_rect(center=(700, 250))
 
@@ -678,9 +740,12 @@ def options_menu():
                     mouse_presses = pygame.mouse.get_pressed()
                     if mouse_presses[0]:
                         if OPTIONS_MUSICON.checkForInput(OPTIONS_MOUSE_POS):
+                            OPTIONS_MUSICON = Button(image=None, pos=(700, 250), 
+                            text_input="MUSIC ON", font=get_font(25), base_color="Black", hovering_color="Red") 
                             pygame.mixer.music.unpause()
                         if OPTIONS_MUSICOFF.checkForInput(OPTIONS_MOUSE_POS):
-                            pygame.mixer.music.pause()	
+                            pygame.mixer.music.pause()
+                            pygame.mixer.Channel(6).pause()	
                         if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                             main_menu()
         pygame.display.update()
