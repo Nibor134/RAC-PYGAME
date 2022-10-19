@@ -4,11 +4,9 @@ import random
 import math
 from os import path
 
-<<<<<<< HEAD
 
-=======
+
 #Game initiation
->>>>>>> d0d6634e37a1066bb8727ced27f3d44a5c2f83e7
 pygame.init()
 pygame.mixer.init
 pygame.mixer.music.load('SpaceMenu.mp3')
@@ -23,10 +21,8 @@ BG = pygame.image.load("Lib/img/space.png")
 BG_G = pygame.image.load("Lib/img/BG_still.jpg")
 HS = pygame.image.load("Lib/img/Startmenu.jpg")
 BG = pygame.transform.scale(BG, (1500, 1000))
-<<<<<<< HEAD
-=======
+
 BG_G = pygame.transform.scale(BG_G, (1000, 500))
->>>>>>> d0d6634e37a1066bb8727ced27f3d44a5c2f83e7
 HS = pygame.transform.scale(HS, (1000, 500))
 rect = HS.get_rect()
 rect = rect.move((0, 0))
@@ -153,7 +149,7 @@ def play_game():
             # Shoot bullets button
             def shoot(self):
                 now = pygame.time.get_ticks()
-<<<<<<< HEAD
+
                 pygame.mixer.music.set_volume(1)
                 pygame.mixer.Channel(7).play(pygame.mixer.Sound('Shoot.mp3'))
                 if now - self.last_bullet > self.bullet_delay:
@@ -162,7 +158,6 @@ def play_game():
                     all_sprites.add(bullet)
                     bullets.add(bullet)
 
-=======
                 if self.power == 1:
                     if now - self.last_bullet > self.bullet_delay:
                         self.last_bullet = now
@@ -180,7 +175,6 @@ def play_game():
                         all_sprites.add(bullet2)
                         bullets.add(bullet2)
         
->>>>>>> d0d6634e37a1066bb8727ced27f3d44a5c2f83e7
         # Enemie fighters
         class Enemies(pygame.sprite.Sprite):
             def __init__(self):
@@ -502,6 +496,7 @@ def play_game():
             # Check to see if enemie hit the player
             hits_player_enemie = pygame.sprite.spritecollide(player, enemies, True, pygame.sprite.collide_circle)
             for hit in hits_player_enemie:
+                newenemie()
                 pygame.mixer.music.set_volume(1)
                 pygame.mixer.Channel(5).play(pygame.mixer.Sound('loselife.mp3'))
                 if player.collision_imune == False:
@@ -625,13 +620,12 @@ def show_go_screen():
         GAMEOVER_RECT = GAMEOVER_TEXT.get_rect(center=(500, 150))
         MANUAL_RECT = MANUAL_TEXT.get_rect(center=(500, 300))
         HS_RECT = HS_TEXT.get_rect(center=(500, 400))
-<<<<<<< HEAD
+
         #HS2_RECT = HS2_TEXT.get_rect(center=(500, 250))
         #SCORE_RECT = SCORE_TEXT.get_rect(center=(500, 130))
-=======
+
         HS2_RECT = HS2_TEXT.get_rect(center=(450, 250))
         SCORE_RECT = SCORE_TEXT.get_rect(center=(700, 250))
->>>>>>> d0d6634e37a1066bb8727ced27f3d44a5c2f83e7
 
         SCREEN.blit(GAMEOVER_TEXT, GAMEOVER_RECT)
         SCREEN.blit(MANUAL_TEXT, MANUAL_RECT)
