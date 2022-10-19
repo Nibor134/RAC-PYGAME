@@ -317,6 +317,30 @@ def play_game():
                 if self.rect.left < -10:
                     self.kill()
 
+        class Planets(pygame.sprite.Sprite):
+            def __init__(self):
+                pygame.sprite.Sprite.__init__(self)
+                self.image_original = random.choice(planet_images)
+                self.image = pygame.transform.scale(self.image_original, (400, 400))
+                self.image.set_colorkey(BLACK)
+                self.rect = self.image.get_rect()
+                self.radius = int(self.rect.width * .93 / 2)
+                # Make the hitbox visible --->
+                # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
+                list_of_cords = [(1000, -250), (1000, 400)]
+                self.rect.x, self.rect.y = random.choice(list_of_cords)
+                self.speedy = 0
+                self.speedx = -2
+
+            def update(self):
+                # killing and spawning new enemies when they go of the screen
+                self.rect.x += self.speedx
+                self.rect.y += self.speedy
+                if self.rect.left < - 1400:
+                    self.kill()
+                    new_planets = Planets()
+                    all_sprites.add(new_planets)
+                    planets.add(new_planets)
 
         # Show how many lives the player has left in the top left corner using images
         def show_lives(surf, x, y, lives, img):
@@ -344,7 +368,7 @@ def play_game():
 
         # Load All game graphics
         #Background
-        background = pygame.image.load(path.join(img_dir, "Background.png")).convert()
+        background = pygame.image.load(path.join(img_dir, "platformback.png.tiff")).convert()
         background_rect = background.get_rect()
         bg_width = background.get_width()
         scroll = 0
@@ -369,6 +393,12 @@ def play_game():
         powerup_images = {}
         powerup_images['better_gun'] = pygame.image.load(path.join(img_dir , 'powerupbullett.png')).convert()
         powerup_images['extra_life'] = pygame.image.load(path.join(img_dir , 'heartlife.png')).convert()
+
+        # Random planet image
+        planet_images = []
+        planet_list = ['planet.png', 'planet2.png', 'planet4.png']
+        for img in planet_list:
+            planet_images.append(pygame.image.load(path.join(img_dir, img)). convert())
 
         # Random meteor image
         meteor_images = []
@@ -398,6 +428,11 @@ def play_game():
             enemies_jets = Enemies()
             all_sprites.add(enemies_jets)
             enemies.add(enemies_jets) 
+        planets = pygame.sprite.Group()
+        for i in range(1):
+            planet = Planets()
+            all_sprites.add(planet)
+            planets.add(planet)
         player = Player()
         powerups = pygame.sprite.Group()
         all_sprites.add(player)
@@ -450,6 +485,17 @@ def play_game():
         
             # update
             all_sprites.update()
+
+            # Check to see if player hit a planet
+            Hits_player_planet = pygame.sprite.spritecollide(player, planets, False, pygame.sprite.collide_circle)
+            for hit in Hits_player_planet:
+                if player.collision_imune == False:
+                    player.lives -= 1
+                    player.rect.centerx = WIDTH / 100
+                    player.rect.bottom = HEIGHT / 2
+                    player.collision_imune = True
+                    player.collision_time = pygame.time.get_ticks()
+
             # Check to see if bullet hits an enemie
             hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
             for hit in hits_bullet_enemie:
@@ -461,7 +507,6 @@ def play_game():
                     more_enemies = Enemies()
                     enemies.add(more_enemies)
                     all_sprites.add(more_enemies)
-
                 # Spawn new enemies when killed by bullet
                 newenemie()
 
