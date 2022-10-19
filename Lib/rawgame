@@ -51,7 +51,7 @@ class Player(pygame.sprite.Sprite):
         self.speedy = 0
         self.bullet_delay = 250
         self.last_bullet = pygame.time.get_ticks()
-        self.lives = 3
+        self.lives = 3000
         self.power = 1
         self.power_time = pygame.time.get_ticks()
         self.powbullet_delay = 0
@@ -229,7 +229,8 @@ class Bullets(pygame.sprite.Sprite):
         # Remove the bullet if it is no longer on the screen
         if self.rect.right > 1000:
             self.kill()
-            
+
+# Explosions for when the enemies get destroyed
 class Explosion(pygame.sprite.Sprite):
     def __init__(self, center, size):
         pygame.sprite.Sprite.__init__(self)
@@ -254,7 +255,9 @@ class Explosion(pygame.sprite.Sprite):
                 self.rect = self.image.get_rect()
                 self.rect.center = center
 
+# Powerups
 class Powerups(pygame.sprite.Sprite):
+
     def __init__(self, center):
         pygame.sprite.Sprite.__init__(self)
         self.type = random.choice(['better_gun', 'extra_life'])
@@ -269,6 +272,31 @@ class Powerups(pygame.sprite.Sprite):
         # Remove the powerup if it is no longer on the screen
         if self.rect.left < -10:
             self.kill()
+
+class Planets(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image_original = random.choice(planet_images)
+        self.image = pygame.transform.scale(self.image_original, (400, 400))
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width * .93 / 2)
+        # Make the hitbox visible --->
+        # pygame.draw.circle(self.image, RED, self.rect.center, self.radius)
+        list_of_cords = [(1000, -250), (1000, 400)]
+        self.rect.x, self.rect.y = random.choice(list_of_cords)
+        self.speedy = 0
+        self.speedx = -2
+
+    def update(self):
+        # killing and spawning new enemies when they go of the screen
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.left < - 1400:
+            self.kill()
+            new_planets = Planets()
+            all_sprites.add(new_planets)
+            planets.add(new_planets)
 
 # Show how many lives the player has left in the top left corner using images
 def show_lives(surf, x, y, lives, img):
@@ -291,7 +319,7 @@ background_rect = background.get_rect()
 bg_width = background.get_width()
 scroll = 0
 tiles = math.ceil(WIDTH / bg_width) + 1
-# Player and Enemies and bullets and sharks
+# Player and Enemies and bullets and sharks and planets
 shark_img = pygame.image.load(path.join(img_dir, "sharkie2.png")).convert()
 player_img = pygame.image.load(path.join(img_dir, "playership1_blue.png")).convert()
 player_lives_img = pygame.transform.scale(player_img, (40, 29))
@@ -303,6 +331,11 @@ meteor_images = []
 meteor_list = ['meteorBrown_big1.png', 'meteorBrown_big2.png', 'meteorBrown_big3.png', 'meteorBrown_big4.png']
 for img in meteor_list:
     meteor_images.append(pygame.image.load(path.join(img_dir, img)).convert())
+# Random planet image
+planet_images = []
+planet_list = ['planet.png', 'planet2.png', 'planet4.png']
+for img in planet_list:
+    planet_images.append(pygame.image.load(path.join(img_dir, img)). convert())
 # Making an image loop so an explosion is visible when something dies
 explosion_img = {}
 explosion_img['big'] = []
@@ -334,7 +367,12 @@ enemies = pygame.sprite.Group()
 for i in range(6):
     enemies_jets = Enemies()
     all_sprites.add(enemies_jets)
-    enemies.add(enemies_jets) 
+    enemies.add(enemies_jets)
+planets = pygame.sprite.Group()
+for i in range(1):
+    planet = Planets()
+    all_sprites.add(planet)
+    planets.add(planet)
 player = Player()
 all_sprites.add(player)
 meteor = pygame.sprite.Group()
@@ -375,6 +413,17 @@ while running:
 
     # Get score in order to increase difficulty
     previous_score = score
+
+    #C Check to see if player hit a planet
+    Hits_player_planet = pygame.sprite.spritecollide(player, planets, False, pygame.sprite.collide_circle)
+    for hit in Hits_player_planet:
+        if player.collision_imune == False:
+            player.lives -= 1
+            player.rect.centerx = WIDTH / 100
+            player.rect.bottom = HEIGHT / 2
+            player.collision_imune = True
+            player.collision_time = pygame.time.get_ticks()
+        # Respawn a planet when it hit the player
 
     # Check to see if bullet hits an enemie
     hits_bullet_enemie = pygame.sprite.groupcollide(enemies, bullets, True, True)
