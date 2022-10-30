@@ -34,14 +34,14 @@ While playing:
 
 Arrow keys to move, Space to Fire.
 
-Credits:
+# Credits:
 
 Alex Elwuar
 Max Looij
 Stan Verdoorn
 Robin Winkels
 
-Bibliography / List of sources
+# Bibliography / List of sources
 
 Youtube - KidsCanCode - Pygame SHMUP - March 2020
 
